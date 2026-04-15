@@ -108,10 +108,11 @@ const ContactSection = () => {
             />
             <button
               type="submit"
-              className="w-full bg-gradient-warm text-primary-foreground py-4 rounded-lg font-semibold text-base font-body hover:opacity-90 transition-opacity shadow-warm flex items-center justify-center gap-2"
+              disabled={submitting}
+              className="w-full bg-gradient-warm text-primary-foreground py-4 rounded-lg font-semibold text-base font-body hover:opacity-90 transition-opacity shadow-warm flex items-center justify-center gap-2 disabled:opacity-50"
             >
               <Send className="w-4 h-4" />
-              Send Quote Request
+              {submitting ? "Sending..." : "Send Quote Request"}
             </button>
           </motion.form>
 
