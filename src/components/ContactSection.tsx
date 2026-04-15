@@ -2,15 +2,32 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Phone, MapPin, Mail, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const ContactSection = () => {
   const { toast } = useToast();
   const [form, setForm] = useState({
     name: "", phone: "", email: "", eventType: "", pax: "", date: "", message: "",
   });
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitting(true);
+    const { error } = await supabase.from("inquiries").insert({
+      name: form.name,
+      phone: form.phone,
+      email: form.email || null,
+      event_type: form.eventType || null,
+      pax: form.pax ? Number(form.pax) : null,
+      event_date: form.date || null,
+      message: form.message || null,
+    });
+    setSubmitting(false);
+    if (error) {
+      toast({ title: "Error", description: "Failed to send. Please try WhatsApp instead.", variant: "destructive" });
+      return;
+    }
     toast({
       title: "Quote Request Sent!",
       description: "We'll get back to you within 24 hours.",
@@ -91,10 +108,11 @@ const ContactSection = () => {
             />
             <button
               type="submit"
-              className="w-full bg-gradient-warm text-primary-foreground py-4 rounded-lg font-semibold text-base font-body hover:opacity-90 transition-opacity shadow-warm flex items-center justify-center gap-2"
+              disabled={submitting}
+              className="w-full bg-gradient-warm text-primary-foreground py-4 rounded-lg font-semibold text-base font-body hover:opacity-90 transition-opacity shadow-warm flex items-center justify-center gap-2 disabled:opacity-50"
             >
               <Send className="w-4 h-4" />
-              Send Quote Request
+              {submitting ? "Sending..." : "Send Quote Request"}
             </button>
           </motion.form>
 
