@@ -4,6 +4,7 @@ import TrustSection from "@/components/TrustSection";
 import ServicesSection from "@/components/ServicesSection";
 import MenuSection from "@/components/MenuSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
+import BrandsSection from "@/components/BrandsSection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 import StickyButtons from "@/components/StickyButtons";
@@ -16,6 +17,7 @@ const Index = () => (
     <ServicesSection />
     <MenuSection />
     <TestimonialsSection />
+    <BrandsSection />
     <ContactSection />
     <Footer />
     <StickyButtons />
