@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { ExternalLink, Instagram, ShoppingBag } from "lucide-react";
-import donplayplayImg from "@/assets/donplayplay-cover.jpg";
-import guudfillsImg from "@/assets/guudfills-cover.jpg";
+import donplayplayImg from "@/assets/donplayplay-logo.jpeg";
+import guudfillsImg from "@/assets/guudfills-logo.jpg";
 
 const brands = [
   {
