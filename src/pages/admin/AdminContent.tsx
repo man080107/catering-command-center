@@ -18,7 +18,7 @@ const defaultKeys = [
 const AdminContent = () => {
   const { toast } = useToast();
   const [content, setContent] = useState<ContentItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [values, setValues] = useState<Record<string, string>>({});
 
   const load = async () => {
@@ -43,7 +43,7 @@ const AdminContent = () => {
     load();
   };
 
-  if (loading) return <p className="text-muted-foreground font-body">Loading...</p>;
+
 
   return (
     <div>

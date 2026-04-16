@@ -12,7 +12,7 @@ const AdminTestimonials = () => {
   const { toast } = useToast();
   const [items, setItems] = useState<Testimonial[]>([]);
   const [editing, setEditing] = useState<Partial<Testimonial> | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const load = async () => {
     const { data } = await supabase.from("testimonials").select("*").order("sort_order");
@@ -47,7 +47,7 @@ const AdminTestimonials = () => {
     load();
   };
 
-  if (loading) return <p className="text-muted-foreground font-body">Loading...</p>;
+
 
   return (
     <div>

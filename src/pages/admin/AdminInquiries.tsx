@@ -12,7 +12,7 @@ type Inquiry = {
 const AdminInquiries = () => {
   const { toast } = useToast();
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const load = async () => {
     const { data } = await supabase.from("inquiries").select("*").order("created_at", { ascending: false });
@@ -32,7 +32,7 @@ const AdminInquiries = () => {
     await supabase.from("inquiries").update({ admin_notes: notes }).eq("id", id);
   };
 
-  if (loading) return <p className="text-muted-foreground font-body">Loading...</p>;
+
 
   return (
     <div>

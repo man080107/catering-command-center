@@ -10,7 +10,18 @@ const AdminLogin = () => {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-background"><p className="text-muted-foreground font-body">Loading...</p></div>;
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="w-full max-w-sm space-y-4">
+        <div className="mx-auto w-16 h-16 bg-muted rounded-2xl animate-pulse" />
+        <div className="h-6 w-32 bg-muted rounded animate-pulse mx-auto" />
+        <div className="h-4 w-40 bg-muted rounded animate-pulse mx-auto" />
+        <div className="h-12 bg-muted rounded-lg animate-pulse mt-4" />
+        <div className="h-12 bg-muted rounded-lg animate-pulse" />
+        <div className="h-12 bg-muted rounded-lg animate-pulse" />
+      </div>
+    </div>
+  );
   if (user && isAdmin) return <Navigate to="/admin" replace />;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,7 +48,7 @@ const AdminLogin = () => {
           <p className="text-sm text-muted-foreground font-body mt-1">2 IC Catering Dashboard</p>
         </div>
 
-        {user && !isAdmin && (
+        {!loading && user && !isAdmin && (
           <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-lg mb-4 font-body text-center">
             You don't have admin access.
           </div>

@@ -20,8 +20,33 @@ const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-background"><p className="text-muted-foreground font-body">Loading...</p></div>;
-  if (!user || !isAdmin) return <Navigate to="/admin/login" replace />;
+  if (loading) return (
+    <div className="min-h-screen bg-muted flex">
+      {/* Skeleton sidebar */}
+      <aside className="hidden lg:flex flex-col w-64 bg-card border-r border-border">
+        <div className="p-5 border-b border-border">
+          <div className="h-5 w-28 bg-muted rounded animate-pulse mb-2" />
+          <div className="h-3 w-20 bg-muted rounded animate-pulse" />
+        </div>
+        <nav className="p-3 space-y-2 flex-1">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-10 rounded-lg bg-muted animate-pulse" />
+          ))}
+        </nav>
+      </aside>
+      {/* Skeleton main */}
+      <div className="flex-1 p-8 space-y-6">
+        <div className="h-8 w-48 bg-card rounded animate-pulse" />
+        <div className="grid grid-cols-3 gap-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-32 bg-card rounded-xl animate-pulse" />
+          ))}
+        </div>
+        <div className="h-64 bg-card rounded-xl animate-pulse" />
+      </div>
+    </div>
+  );
+  if (!loading && (!user || !isAdmin)) return <Navigate to="/admin/login" replace />;
 
   return (
     <div className="min-h-screen bg-muted flex">

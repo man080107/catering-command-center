@@ -1,48 +1,34 @@
 import { motion } from "framer-motion";
-import { Building2, UtensilsCrossed, Salad, PartyPopper, Cake, Package } from "lucide-react";
+import { Building2, UtensilsCrossed, PartyPopper, Package } from "lucide-react";
 import corporateImg from "@/assets/2.jpeg";
 import buffetImg from "@/assets/3.jpeg";
-import bentoImg from "@/assets/4.jpeg";
-import festiveImg from "@/assets/5.jpeg";
-import refreshImg from "@/assets/6.jpeg";
+import bespokeImg from "@/assets/beskope.jpeg";
 import bulkImg from "@/assets/hero-buffet.jpg";
 
 const services = [
   {
     icon: Building2,
-    title: "Corporate Catering",
-    desc: "Office lunches, team events, and large-scale corporate functions for 100+ pax.",
-    img: corporateImg,
-  },
-  {
-    icon: UtensilsCrossed,
-    title: "Buffet Catering",
-    desc: "Bronze, Silver & Gold packages from $16.80/pax with full setup included.",
-    img: buffetImg,
-  },
-  {
-    icon: Salad,
-    title: "Healthy Bento Sets",
-    desc: "Nutritious grain bowls and bento from $10/pax. Min 10 pax order.",
-    img: bentoImg,
+    title: "Associates' Cafeteria & Meal Management",
+    desc: "Running daily meals for staff, handling the full cafeteria operation.",
+    img: bulkImg,
   },
   {
     icon: PartyPopper,
-    title: "Festive Catering",
-    desc: "Chinese New Year, Christmas, Hari Raya — special festive menus available.",
-    img: festiveImg,
+    title: "Buffet Catering Events",
+    desc: "Set menus available, but we're always open to customize selections to suit your preferences.",
+    img: buffetImg,
   },
   {
-    icon: Cake,
-    title: "Refreshments & Mini Bites",
-    desc: "Dim sum, sandwiches, mini don bowls, desserts and drinks for tea breaks.",
-    img: refreshImg,
+    icon: UtensilsCrossed,
+    title: "Corporate Meals",
+    desc: "Bento & buffet options with wide variety — local favorites, Malay, Indian, Japanese and Western cuisine.",
+    img: corporateImg,
   },
   {
     icon: Package,
-    title: "Bulk Event Orders",
-    desc: "Scalable catering for events of any size. Competitive pricing for large orders.",
-    img: bulkImg,
+    title: "Bespoke Culinary Management",
+    desc: "Partnership-based, producing food tailored specifically to clients' needs.",
+    img: bespokeImg,
   },
 ];
 
@@ -64,7 +50,7 @@ const ServicesSection = () => {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {services.map((s, i) => (
             <motion.div
               key={s.title}

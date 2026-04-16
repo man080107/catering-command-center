@@ -132,13 +132,14 @@ const ContactSection = () => {
                   <p className="text-xs text-muted-foreground font-body">Call or WhatsApp</p>
                 </div>
               </a>
-              <a href="mailto:enquiry@2iccatering.com" className="flex items-center gap-3 text-foreground/80 hover:text-primary transition-colors">
-                <Mail className="w-5 h-5 text-primary" />
-                <div>
-                  <p className="font-semibold font-body text-sm">enquiry@2iccatering.com</p>
+              <div className="flex items-start gap-3 text-foreground/80">
+                <Mail className="w-5 h-5 text-primary mt-0.5" />
+                <div className="flex flex-col gap-1">
+                  <a href="mailto:Kenny.huang@2iccatering.com" className="font-semibold font-body text-sm hover:text-primary transition-colors break-all">Kenny.huang@2iccatering.com</a>
+                  <a href="mailto:Kennyjosephhuang@gmail.com" className="font-semibold font-body text-sm hover:text-primary transition-colors break-all">Kennyjosephhuang@gmail.com</a>
                   <p className="text-xs text-muted-foreground font-body">Email us anytime</p>
                 </div>
-              </a>
+              </div>
               <div className="flex items-start gap-3 text-foreground/80">
                 <MapPin className="w-5 h-5 text-primary mt-0.5" />
                 <div>

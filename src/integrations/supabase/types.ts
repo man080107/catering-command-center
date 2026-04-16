@@ -104,6 +104,70 @@ export type Database = {
         }
         Relationships: []
       }
+      menu_categories: {
+        Row: {
+          id: string
+          package_id: string | null
+          label: string
+          sort_order: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          package_id?: string | null
+          label: string
+          sort_order?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          package_id?: string | null
+          label?: string
+          sort_order?: number
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_categories_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "menu_packages"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      menu_dishes: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          id: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_dishes_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "menu_categories"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       menu_items: {
         Row: {
           category: string
@@ -155,6 +219,48 @@ export type Database = {
           price_label?: string | null
           sort_order?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      menu_packages: {
+        Row: {
+          courses: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_popular: boolean | null
+          min_pax: number | null
+          name: string
+          price: number | null
+          price_label: string | null
+          sort_order: number | null
+          tab: string
+        }
+        Insert: {
+          courses?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_popular?: boolean | null
+          min_pax?: number | null
+          name: string
+          price?: number | null
+          price_label?: string | null
+          sort_order?: number | null
+          tab: string
+        }
+        Update: {
+          courses?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_popular?: boolean | null
+          min_pax?: number | null
+          name?: string
+          price?: number | null
+          price_label?: string | null
+          sort_order?: number | null
+          tab?: string
         }
         Relationships: []
       }

@@ -13,7 +13,7 @@ const AdminBrands = () => {
   const { toast } = useToast();
   const [brands, setBrands] = useState<Brand[]>([]);
   const [editing, setEditing] = useState<Partial<Brand> | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const load = async () => {
     const { data } = await supabase.from("brands").select("*").order("sort_order");
@@ -48,7 +48,7 @@ const AdminBrands = () => {
     load();
   };
 
-  if (loading) return <p className="text-muted-foreground font-body">Loading...</p>;
+
 
   return (
     <div>
