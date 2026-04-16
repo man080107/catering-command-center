@@ -2,6 +2,22 @@ import { motion } from "framer-motion";
 import { ExternalLink, Instagram, ShoppingBag } from "lucide-react";
 import donplayplayImg from "@/assets/donplayplay-logo.jpeg";
 import guudfillsImg from "@/assets/guudfills-logo.jpg";
+import g1 from "@/assets/g1.jpeg";
+import g2 from "@/assets/g2.jpeg";
+import g3 from "@/assets/g3.jpeg";
+import g4 from "@/assets/g4.jpeg";
+import g5 from "@/assets/g5.jpeg";
+import h1 from "@/assets/h1.jpeg";
+import h2 from "@/assets/h2.jpeg";
+import h3 from "@/assets/h3.jpeg";
+import h4 from "@/assets/h4.jpeg";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const brands = [
   {
@@ -9,7 +25,7 @@ const brands = [
     tagline: "Premium Japanese Donburi Bowls",
     description:
       "Indulge in our signature donburi bowls — from torched salmon to truffle beef don. Bold flavours, generous portions, no play play.",
-    image: donplayplayImg,
+    images: [donplayplayImg, h1, h2, h3, h4],
     links: {
       website: "https://www.donplayplay.com",
       instagram: "https://www.instagram.com/donplayplaysg",
@@ -18,10 +34,10 @@ const brands = [
   },
   {
     name: "Guudfills",
-    tagline: "Artisan Filled Pastries & Baked Goods",
+    tagline: "Artisan Filled Pastries & Bowls",
     description:
-      "Handcrafted buns, croissants and pastries with irresistible fillings. Perfect for breakfast catering, tea breaks, and gifting.",
-    image: guudfillsImg,
+      "A variety of irresistible hand-crafted flavors ranging from premium filled pastries to rich salmon and scallop dishes.",
+    images: [guudfillsImg, g1, g2, g3, g4, g5],
     links: {
       order: "https://take.app/guudfills",
       instagram: "https://www.instagram.com/guudfills",
@@ -58,16 +74,36 @@ const BrandsSection = () => {
               transition={{ delay: i * 0.15 }}
               className="group relative rounded-2xl overflow-hidden bg-card border border-border shadow-card hover:shadow-warm transition-all duration-500"
             >
-              {/* Cover Image */}
-              <div className="relative h-56 md:h-64 overflow-hidden">
-                <img
-                  src={brand.image}
-                  alt={brand.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-foreground/20 to-transparent" />
-                <div className="absolute bottom-4 left-5 right-5">
+              {/* Cover Images Carousel */}
+              <div className="relative aspect-square sm:aspect-[4/3] w-full overflow-hidden bg-black/5 dark:bg-black/40">
+                <Carousel className="w-full h-full" opts={{ loop: true }}>
+                  <CarouselContent className="h-full">
+                    {brand.images.map((img, idx) => (
+                      <CarouselItem key={idx} className="h-full w-full relative">
+                        <img
+                          src={img}
+                          alt={`${brand.name} ${idx + 1}`}
+                          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700"
+                          loading="lazy"
+                        />
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  
+                  {brand.images.length > 1 && (
+                    <div className="absolute inset-0 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                      <div className="pointer-events-auto ml-2">
+                        <CarouselPrevious className="relative left-0 bg-background/80 hover:bg-background border-none w-8 h-8 rounded-full" />
+                      </div>
+                      <div className="pointer-events-auto mr-2">
+                        <CarouselNext className="relative right-0 bg-background/80 hover:bg-background border-none w-8 h-8 rounded-full" />
+                      </div>
+                    </div>
+                  )}
+                </Carousel>
+                
+                <div className="absolute pointer-events-none inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
+                <div className="absolute pointer-events-none bottom-4 left-5 right-5">
                   <h3 className="text-2xl font-bold font-display text-primary-foreground drop-shadow-lg">
                     {brand.name}
                   </h3>

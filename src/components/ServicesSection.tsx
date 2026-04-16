@@ -1,10 +1,11 @@
 import { motion } from "framer-motion";
 import { Building2, UtensilsCrossed, Salad, PartyPopper, Cake, Package } from "lucide-react";
-import corporateImg from "@/assets/corporate-event.jpg";
-import buffetImg from "@/assets/hero-buffet.jpg";
-import bentoImg from "@/assets/bento-set.jpg";
-import festiveImg from "@/assets/festive-catering.jpg";
-import refreshImg from "@/assets/refreshments.jpg";
+import corporateImg from "@/assets/2.jpeg";
+import buffetImg from "@/assets/3.jpeg";
+import bentoImg from "@/assets/4.jpeg";
+import festiveImg from "@/assets/5.jpeg";
+import refreshImg from "@/assets/6.jpeg";
+import bulkImg from "@/assets/hero-buffet.jpg";
 
 const services = [
   {
@@ -41,7 +42,7 @@ const services = [
     icon: Package,
     title: "Bulk Event Orders",
     desc: "Scalable catering for events of any size. Competitive pricing for large orders.",
-    img: corporateImg,
+    img: bulkImg,
   },
 ];
 

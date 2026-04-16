@@ -25,7 +25,8 @@ const ContactSection = () => {
     });
     setSubmitting(false);
     if (error) {
-      toast({ title: "Error", description: "Failed to send. Please try WhatsApp instead.", variant: "destructive" });
+      console.error("Inquiry Error Payload:", error);
+      toast({ title: "Error", description: "Failed to send: " + (error.message || error.details || "Unknown error"), variant: "destructive" });
       return;
     }
     toast({
