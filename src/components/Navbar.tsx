@@ -3,35 +3,44 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Phone } from "lucide-react";
 import logo from "@/assets/logo.jpg";
 
+import { Link, useLocation } from "react-router-dom";
+
 const navLinks = [
-  { label: "Home", href: "#home" },
-  { label: "Services", href: "#services" },
-  { label: "Menu", href: "#menu" },
-  { label: "Testimonials", href: "#testimonials" },
-  { label: "Brands", href: "#brands" },
-  { label: "Contact", href: "#contact" },
+  { label: "Home", href: "/" },
+  { label: "About Us", href: "/about" },
+  { label: "Services", href: "/#services" },
+  { label: "Menu", href: "/#menu" },
+  { label: "Testimonials", href: "/#testimonials" },
+  { label: "Brands", href: "/#brands" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
       <div className="container mx-auto px-4 flex items-center justify-between h-16 md:h-20">
-        <a href="#home" className="flex items-center gap-2">
+        <a href="/" className="flex items-center gap-2">
           <img src={logo} alt="2 IC Catering" className="h-10 md:h-12 w-auto" />
         </a>
 
         <div className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className="font-body text-sm font-medium text-foreground/70 hover:text-primary transition-colors"
-            >
-              {link.label}
-            </a>
-          ))}
+          {navLinks.map((link) => {
+            const isHash = link.href.includes('#');
+            // If on home page, use just the hash to enable smooth scroll without reload
+            const to = isHash && location.pathname === '/' ? link.href.substring(1) : link.href;
+            return (
+              <a
+                key={link.label}
+                href={to}
+                className="font-body text-sm font-medium text-foreground/70 hover:text-primary transition-colors"
+              >
+                {link.label}
+              </a>
+            );
+          })}
         </div>
 
         <div className="hidden md:flex items-center gap-3">
@@ -67,16 +76,20 @@ const Navbar = () => {
             className="md:hidden overflow-hidden bg-background border-b border-border"
           >
             <div className="px-4 py-4 flex flex-col gap-3">
-              {navLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  onClick={() => setIsOpen(false)}
-                  className="font-body text-base font-medium text-foreground/80 py-2"
-                >
-                  {link.label}
-                </a>
-              ))}
+              {navLinks.map((link) => {
+                const isHash = link.href.includes('#');
+                const to = isHash && location.pathname === '/' ? link.href.substring(1) : link.href;
+                return (
+                  <a
+                    key={link.label}
+                    href={to}
+                    onClick={() => setIsOpen(false)}
+                    className="font-body text-base font-medium text-foreground/80 py-2"
+                  >
+                    {link.label}
+                  </a>
+                );
+              })}
               <a
                 href="#contact"
                 onClick={() => setIsOpen(false)}

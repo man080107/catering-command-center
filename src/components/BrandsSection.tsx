@@ -30,6 +30,7 @@ const brands = [
       website: "https://www.donplayplay.com",
       instagram: "https://www.instagram.com/donplayplaysg",
     },
+    imageClass: "object-cover object-center",
     accent: "from-amber-600 to-orange-500",
   },
   {
@@ -42,6 +43,7 @@ const brands = [
       order: "https://take.app/guudfills",
       instagram: "https://www.instagram.com/guudfills",
     },
+    imageClass: "object-contain bg-background object-center",
     accent: "from-yellow-600 to-amber-500",
   },
 ];
@@ -83,7 +85,7 @@ const BrandsSection = () => {
                         <img
                           src={img}
                           alt={`${brand.name} ${idx + 1}`}
-                          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700"
+                          className={`w-full h-full ${brand.imageClass || 'object-cover'} group-hover:scale-105 transition-transform duration-700`}
                           loading="lazy"
                         />
                       </CarouselItem>
