@@ -144,9 +144,9 @@ const ALL_FALLBACK: Package[] = [
   ...fallbackBentoAsian,
 ];
 
-const formatMinPax = (pax: string | null) => {
+const formatMinPax = (pax: any) => {
   if (!pax) return "";
-  const p = pax.trim();
+  const p = String(pax).trim();
   const lower = p.toLowerCase();
   const hasMin = lower.includes("min");
   const hasPax = lower.includes("pax") || lower.includes("sets");
