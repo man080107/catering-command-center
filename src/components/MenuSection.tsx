@@ -494,18 +494,25 @@ const MenuSection = () => {
 
             {/* ── SEASONAL/FESTIVE MENU ── */}
             {activeTab === 5 && (
-              <motion.div key="seasonal" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="max-w-4xl mx-auto text-center">
-                <p className="text-lg text-muted-foreground font-body mb-8">
-                  Contact us for more information!
-                </p>
-                <div className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory scrollbar-hide">
-                  {seasonalImages.map((src, idx) => (
-                    <img key={idx} src={src} alt="Seasonal/Festive Menu" className="h-[60vh] object-contain rounded-xl shadow-card snap-center shrink-0 bg-background/50 border border-border" />
-                  ))}
+              <motion.div key="seasonal" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="max-w-5xl mx-auto">
+                {activePackages.length > 0 && (
+                  <div className="grid md:grid-cols-3 gap-6 mb-12">
+                    {activePackages.map((pkg) => <BuffetCard key={pkg.id} pkg={pkg} />)}
+                  </div>
+                )}
+                <div className="text-center">
+                  <p className="text-lg text-muted-foreground font-body mb-8">
+                    Contact us for more information!
+                  </p>
+                  <div className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory scrollbar-hide">
+                    {seasonalImages.map((src, idx) => (
+                      <img key={idx} src={src} alt="Seasonal/Festive Menu" className="h-[60vh] object-contain rounded-xl shadow-card snap-center shrink-0 bg-background/50 border border-border" />
+                    ))}
+                  </div>
+                  <p className="text-center text-xs text-muted-foreground font-body mt-2">
+                    Swipe or scroll to see more
+                  </p>
                 </div>
-                <p className="text-center text-xs text-muted-foreground font-body mt-2">
-                  Swipe or scroll to see more
-                </p>
               </motion.div>
             )}
 

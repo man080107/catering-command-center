@@ -11,7 +11,7 @@ type MenuItem = { id: string; category: string; name: string; description: strin
 
 const AdminMenu = () => {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<"buffet" | "bento" | "connect" | "refreshment" | "bento_asian">("buffet");
+  const [activeTab, setActiveTab] = useState<"buffet" | "bento" | "connect" | "refreshments" | "bento_asian" | "seasonal">("buffet");
   
   // Data State
   const [packages, setPackages] = useState<MenuPackage[]>([]);
@@ -330,7 +330,8 @@ const AdminMenu = () => {
           { id: "bento_asian", label: "Bento - Asian/Local Favourites" },
           { id: "bento", label: "Bento - Healthier Choice" },
           { id: "connect", label: "Connect Takeaway" },
-          { id: "refreshment", label: "Refreshments" },
+          { id: "refreshments", label: "Refreshments" },
+          { id: "seasonal", label: "Seasonal/Festive menu" },
         ].map(tab => (
            <button 
              key={tab.id}
