@@ -25,8 +25,8 @@ const Footer = () => (
           <ul className="space-y-2 font-body text-sm text-primary-foreground/60">
             <li>+65 9838 9733</li>
             <li>15 Jln Tepong, Singapore 619336</li>
-            <li><a href="mailto:Kenny.huang@2iccatering.com" className="hover:text-primary-foreground transition-colors break-all">Kenny.huang@2iccatering.com</a></li>
-            <li><a href="mailto:Kennyjosephhuang@gmail.com" className="hover:text-primary-foreground transition-colors break-all">Kennyjosephhuang@gmail.com</a></li>
+            <li><a href="mailto:kenny.huang@2iccatering.com" className="hover:text-primary-foreground transition-colors break-all">kenny.huang@2iccatering.com</a></li>
+            <li><a href="mailto:admin@2iccatering.com" className="hover:text-primary-foreground transition-colors break-all">admin@2iccatering.com</a></li>
           </ul>
         </div>
       </div>

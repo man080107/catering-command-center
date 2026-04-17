@@ -11,7 +11,7 @@ import seasonalE from "@/assets/e.jpeg";
 import seasonalF from "@/assets/f.jpeg";
 const seasonalImages = [seasonalA, seasonalB, seasonalC, seasonalD, seasonalE, seasonalF];
 
-const tabs = ["Buffet Packages", "Bento - Asian/Local Favourites", "Bento Sets", "Connect Takeaway", "Refreshments", "Seasonal/Festive menu"];
+const tabs = ["Buffet Packages", "Bento - Asian/Local Favourites", "Bento - Healthier Choice", "Connect Takeaway", "Refreshments", "Seasonal/Festive menu"];
 const tabKeys = ["buffet", "bento_asian", "bento", "connect", "refreshments", "seasonal"];
 
 // Database Types

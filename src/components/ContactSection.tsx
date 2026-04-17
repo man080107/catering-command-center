@@ -135,8 +135,8 @@ const ContactSection = () => {
               <div className="flex items-start gap-3 text-foreground/80">
                 <Mail className="w-5 h-5 text-primary mt-0.5" />
                 <div className="flex flex-col gap-1">
-                  <a href="mailto:Kenny.huang@2iccatering.com" className="font-semibold font-body text-sm hover:text-primary transition-colors break-all">Kenny.huang@2iccatering.com</a>
-                  <a href="mailto:Kennyjosephhuang@gmail.com" className="font-semibold font-body text-sm hover:text-primary transition-colors break-all">Kennyjosephhuang@gmail.com</a>
+                  <a href="mailto:kenny.huang@2iccatering.com" className="font-semibold font-body text-sm hover:text-primary transition-colors break-all">kenny.huang@2iccatering.com</a>
+                  <a href="mailto:admin@2iccatering.com" className="font-semibold font-body text-sm hover:text-primary transition-colors break-all">admin@2iccatering.com</a>
                   <p className="text-xs text-muted-foreground font-body">Email us anytime</p>
                 </div>
               </div>

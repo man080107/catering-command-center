@@ -328,7 +328,7 @@ const AdminMenu = () => {
         {[
           { id: "buffet", label: "Buffet Packages" },
           { id: "bento_asian", label: "Bento - Asian/Local Favourites" },
-          { id: "bento", label: "Bento Sets" },
+          { id: "bento", label: "Bento - Healthier Choice" },
           { id: "connect", label: "Connect Takeaway" },
           { id: "refreshment", label: "Refreshments" },
         ].map(tab => (
