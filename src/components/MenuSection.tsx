@@ -217,11 +217,17 @@ const MenuSection = () => {
     const loadMenus = async () => {
       setLoading(true);
       try {
-        const [pkgRes, catRes, dishRes] = await Promise.all([
+        const fetchPromise = Promise.all([
           supabase.from("menu_packages").select("*").order("sort_order"),
           supabase.from("menu_categories").select("*").order("sort_order"),
           supabase.from("menu_dishes").select("*").order("sort_order"),
         ]);
+
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Supabase timeout")), 5000)
+        );
+
+        const [pkgRes, catRes, dishRes] = await Promise.race([fetchPromise, timeoutPromise]) as any;
 
         const pkgsData = pkgRes.data || [];
         const catsData = catRes.data || [];
