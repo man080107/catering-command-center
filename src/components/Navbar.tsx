@@ -31,6 +31,19 @@ const Navbar = () => {
             const isHash = link.href.includes('#');
             // If on home page, use just the hash to enable smooth scroll without reload
             const to = isHash && location.pathname === '/' ? link.href.substring(1) : link.href;
+            
+            if (!isHash) {
+              return (
+                <Link
+                  key={link.label}
+                  to={to}
+                  className="font-body text-sm font-medium text-foreground/70 hover:text-primary transition-colors"
+                >
+                  {link.label}
+                </Link>
+              );
+            }
+
             return (
               <a
                 key={link.label}
@@ -80,6 +93,20 @@ const Navbar = () => {
               {navLinks.map((link) => {
                 const isHash = link.href.includes('#');
                 const to = isHash && location.pathname === '/' ? link.href.substring(1) : link.href;
+                
+                if (!isHash) {
+                  return (
+                    <Link
+                      key={link.label}
+                      to={to}
+                      onClick={() => setIsOpen(false)}
+                      className="font-body text-base font-medium text-foreground/80 py-2"
+                    >
+                      {link.label}
+                    </Link>
+                  );
+                }
+
                 return (
                   <a
                     key={link.label}
