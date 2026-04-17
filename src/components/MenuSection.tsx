@@ -3,8 +3,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
-const tabs = ["Buffet Packages", "Bento Sets", "Connect Takeaway", "Refreshments"];
-const tabKeys = ["buffet", "bento", "connect", "refreshments"];
+import seasonalA from "@/assets/a.jpeg";
+import seasonalB from "@/assets/b.jpeg";
+import seasonalC from "@/assets/c.jpeg";
+import seasonalD from "@/assets/d.jpeg";
+import seasonalE from "@/assets/e.jpeg";
+import seasonalF from "@/assets/f.jpeg";
+const seasonalImages = [seasonalA, seasonalB, seasonalC, seasonalD, seasonalE, seasonalF];
+
+const tabs = ["Buffet Packages", "Bento - Asian/Local Favourites", "Bento Sets", "Connect Takeaway", "Refreshments", "Seasonal/Festive menu"];
+const tabKeys = ["buffet", "bento_asian", "bento", "connect", "refreshments", "seasonal"];
 
 // Database Types
 type Category = { id: string; label: string; items: string[] };
@@ -107,11 +115,33 @@ const fallbackRefreshments: Package[] = [{
   ],
 }];
 
+const fallbackBentoAsian: Package[] = [
+  { id: "ba1", tab: "bento_asian", name: "Set 1 - Ayam Penyet (Boneless) Chicken Set", price: 10, price_label: "/pax", courses: null, min_pax: "Min 10 sets", is_popular: false, description: "Fragrant Rice, Ayam Penyet, Tempeh, Bergedil, Housemade Belacan (Separate), Roasted Cherry Tomato", categories: [] },
+  { id: "ba2", tab: "bento_asian", name: "Set 2 - Blue Pea Nasi Lemak (Turmeric Chicken) Set", price: 10, price_label: "/pax", courses: null, min_pax: "Min 10 sets", is_popular: false, description: "Blue Pea Nasi Lemak, Baked Chicken Breast with Signature Turmeric Lemak Sauce, Omelette, Sambal Goreng, Ikan Bilis & Peanut, Nasi Lemak Chili (Separate)", categories: [] },
+  { id: "ba3", tab: "bento_asian", name: "Set 3 - Pandan Nasi Lemak (Fried Midwings) Set", price: 10, price_label: "/pax", courses: null, min_pax: "Min 10 sets", is_popular: false, description: "Pandan Nasi Lemak, Fried Chicken Midwings, Muar Fish Otah, Sambal Egg, Stir Fried French Bean, Ikan Bilis & Peanut", categories: [] },
+  { id: "ba4", tab: "bento_asian", name: "Set 4 - Nasi Briyani (Mutton Rendang) Set", price: 10, price_label: "/pax", courses: null, min_pax: "Min 10 sets", is_popular: false, description: "Briyani Rice, Mutton Rendang (Mild Spicy), Omelette, Samosa, Brinjal Masala (Mild Spicy)", categories: [] },
+  { id: "ba5", tab: "bento_asian", name: "Set 5 - Nasi Briyani (Chicken Rendang) Set", price: 10, price_label: "/pax", courses: null, min_pax: "Min 10 sets", is_popular: false, description: "Briyani Rice, Chicken Rendang (Mild Spicy), Omelette, Samosa, Brinjal Masala (Mild Spicy)", categories: [] },
+  { id: "ba6", tab: "bento_asian", name: "Set 6 - Nasi Briyani (Beef Rendang) Set", price: 10, price_label: "/pax", courses: null, min_pax: "Min 10 sets", is_popular: false, description: "Briyani Rice, Beef Rendang (Mild Spicy), Omelette, Samosa, Brinjal Masala (Mild Spicy)", categories: [] },
+  { id: "ba7", tab: "bento_asian", name: "Set 7 - Oriental Honey Chicken Rice Set", price: 10, price_label: "/pax", courses: null, min_pax: "Min 10 sets", is_popular: false, description: "Fragrant Rice, Boneless Honey Chicken, Braised Egg, Ngoh Hiang Ball, HK Kailan w Mushroom, Chicken Rice Chili (Mild Spicy)", categories: [] },
+  { id: "ba8", tab: "bento_asian", name: "Set 8 - Black Pepper Chicken & Cereal Fish Fillet Set", price: 10, price_label: "/pax", courses: null, min_pax: "Min 10 sets", is_popular: false, description: "Steam White Rice, Black Pepper Chicken, Cereal Fish Fillet, Sliced Potato w Sweet Thai Chili, HK Chye Sim", categories: [] },
+  { id: "ba9", tab: "bento_asian", name: "Set 9 - Nasi Goreng Kampung w Ayam Masak Kicap", price: 10, price_label: "/pax", courses: null, min_pax: "Min 10 sets", is_popular: false, description: "Nasi Goreng Kampung, Ayam Masak Kicap, Sambal Potato, Baby Kailan w Oyster Sauce", categories: [] },
+  { id: "ba10", tab: "bento_asian", name: "Set 10 - Ayam Berlado Set", price: 10, price_label: "/pax", courses: null, min_pax: "Min 10 sets", is_popular: false, description: "Steam White Rice, Ayam Berlado, Potato Bergedil, Omelette, Stir Fried Sambal Ladies Finger", categories: [] },
+  { id: "ba11", tab: "bento_asian", name: "Set 11 - Ayam Masak Merah", price: 10, price_label: "/pax", courses: null, min_pax: "Min 10 sets", is_popular: false, description: "Steam White Rice, Ayam Masak Merah, Breaded Fish Fillet, Omelette, Stir Fried Sambal Petai w Eggplant", categories: [] },
+  { id: "ba12", tab: "bento_asian", name: "Set 12 - Beef Masak Kandar w Nasi Minyak Set", price: 10, price_label: "/pax", courses: null, min_pax: "Min 10 sets", is_popular: false, description: "Nasi Minyak, Beef Masak Kandar, Potato Samosa, Sambal Egg, Stir Fried Cabbage", categories: [] },
+  { id: "ba13", tab: "bento_asian", name: "Set 13 - Turmeric Seabass Fillet Set", price: 10, price_label: "/pax", courses: null, min_pax: "Min 10 sets", is_popular: false, description: "Steam White Rice, Baked Seabass with Signature Turmeric Lemak Sauce, Omelette, JPN Tofu w Egg White Sauce & Mixed Vegetables, Baby Kailan w Oyster Sauce", categories: [] },
+  { id: "ba14", tab: "bento_asian", name: "Set 14 - Prawn Paste Chicken & Sweet & Sour Fish Set", price: 10, price_label: "/pax", courses: null, min_pax: "Min 10 sets", is_popular: false, description: "Steam White Rice, Prawn Paste Chicken Midwing, Sweet & Sour Fish w Capsicum & Pineapple, Braised Potato, Broccoli w Mushroom", categories: [] },
+  { id: "ba15", tab: "bento_asian", name: "Set 15 - Butter Chicken w Nasi Minyak Set", price: 10, price_label: "/pax", courses: null, min_pax: "Min 10 sets", is_popular: false, description: "Nasi Minyak, Butter Chicken Masala (Mild Spicy), Egg Kurma (Mild Spicy), Samosa, Long Bean Masala (Mild Spicy)", categories: [] },
+  { id: "ba16", tab: "bento_asian", name: "Set 16 - Black Pepper Vegetarian (Plant-Based Meat) Set", price: 10, price_label: "/pax", courses: null, min_pax: "Min 10 sets", is_popular: false, description: "Vegetarian Long Bean Fried Rice, Black Pepper Plant-based Meat w Capsicum, Braised Potato, HK Chye Sim", categories: [] },
+  { id: "ba17", tab: "bento_asian", name: "Set 17 - Turmeric Vegetarian (Plant-Based Meat) Set", price: 10, price_label: "/pax", courses: null, min_pax: "Min 10 sets", is_popular: false, description: "Vegetarian Sambal Fried Rice, Signature Turmeric Lemak Sauce w Plant-based Meat, Breaded Pumpkin, Broccoli w Mushroom", categories: [] },
+  { id: "ba18", tab: "bento_asian", name: "Set 18 - Sweet & Sour Vegetarian (Plant-Based Meat) Set", price: 10, price_label: "/pax", courses: null, min_pax: "Min 10 sets", is_popular: false, description: "Vegetarian Olive Fried Rice, Sweet & Sour Plant-based Meat w Capsicum & Pineapple, HK Kailan w Mushroom, Crispy Soya Skin", categories: [] },
+];
+
 const ALL_FALLBACK: Package[] = [
   ...fallbackBuffet,
   ...fallbackBentoSets,
   ...fallbackConnect,
   ...fallbackRefreshments,
+  ...fallbackBentoAsian,
 ];
 
 /* ──────────────────────── EXPANDABLE BUFFET CARD ──────────────────────── */
@@ -237,6 +267,7 @@ const MenuSection = () => {
   const currentTabKey = tabKeys[activeTab];
   const activePackages = packages.filter((p) => p.tab === currentTabKey);
   const bentoPackages = packages.filter((p) => p.tab === "bento");
+  const bentoAsianPackages = packages.filter((p) => p.tab === "bento_asian");
 
   return (
     <section id="menu" className="py-20 bg-card min-h-screen">
@@ -291,8 +322,41 @@ const MenuSection = () => {
               </motion.div>
             )}
 
-            {/* ── BENTO ── */}
+            {/* ── BENTO ASIAN / LOCAL FAVOURITES ── */}
             {activeTab === 1 && (
+              <motion.div key="bento_asian" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                <div className="text-center mb-8">
+                  <div className="inline-flex items-center gap-2 bg-accent/10 text-accent-foreground px-4 py-2 rounded-full">
+                    <span className="text-2xl font-bold font-display text-primary">$10</span>
+                    <span className="text-sm font-body text-muted-foreground">/pax · Min 10 sets</span>
+                  </div>
+                </div>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
+                  {bentoAsianPackages.map((set) => {
+                    const sepIdx = set.name.search(/[:\-]/);
+                    const bentoName = sepIdx > 0 ? set.name.slice(0, sepIdx).trim() : set.name;
+                    const bentoTitle = sepIdx > 0 ? set.name.slice(sepIdx + 1).trim() : set.name;
+
+                    return (
+                      <div key={set.id} className="bg-background rounded-xl border border-border p-5 hover:shadow-card transition-shadow">
+                        <span className="text-xs font-bold text-primary font-body">{bentoName}</span>
+                        <h4 className="font-bold font-display text-foreground mt-1 mb-2 text-sm leading-snug">{bentoTitle}</h4>
+                        <p className="text-xs text-muted-foreground font-body leading-relaxed">{set.description}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+                {bentoAsianPackages.length === 0 && (
+                  <p className="text-center text-muted-foreground py-10">Bento sets are updating...</p>
+                )}
+                <p className="text-center text-xs text-muted-foreground font-body mt-6">
+                  Includes full cutlery set &amp; serviettes. Food best consumed within 2 hours. Transportation: $10 (excl. GST) for orders under $300.
+                </p>
+              </motion.div>
+            )}
+
+            {/* ── BENTO ── */}
+            {activeTab === 2 && (
               <motion.div key="bento" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
                 <div className="text-center mb-8">
                   <div className="inline-flex items-center gap-2 bg-accent/10 text-accent-foreground px-4 py-2 rounded-full">
@@ -326,7 +390,7 @@ const MenuSection = () => {
             )}
 
             {/* ── CONNECT TAKEAWAY ── */}
-            {activeTab === 2 && (
+            {activeTab === 3 && (
               <motion.div key="connect" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
                 className="max-w-5xl mx-auto"
               >
@@ -366,7 +430,7 @@ const MenuSection = () => {
             )}
 
             {/* ── REFRESHMENTS ── */}
-            {activeTab === 3 && (
+            {activeTab === 4 && (
               <motion.div key="refreshments" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
                 className="max-w-5xl mx-auto"
               >
@@ -397,6 +461,23 @@ const MenuSection = () => {
                 )}
                 <p className="text-center text-xs text-muted-foreground font-body mt-6">
                   Includes disposable wares, serviettes &amp; garbage bags. Transportation: $15 (excl. GST). Buffet setup &amp; clear up service: $85 (excl. GST).
+                </p>
+              </motion.div>
+            )}
+
+            {/* ── SEASONAL/FESTIVE MENU ── */}
+            {activeTab === 5 && (
+              <motion.div key="seasonal" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="max-w-4xl mx-auto text-center">
+                <p className="text-lg text-muted-foreground font-body mb-8">
+                  Contact us for more information!
+                </p>
+                <div className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory scrollbar-hide">
+                  {seasonalImages.map((src, idx) => (
+                    <img key={idx} src={src} alt="Seasonal/Festive Menu" className="h-[60vh] object-contain rounded-xl shadow-card snap-center shrink-0 bg-background/50 border border-border" />
+                  ))}
+                </div>
+                <p className="text-center text-xs text-muted-foreground font-body mt-2">
+                  Swipe or scroll to see more
                 </p>
               </motion.div>
             )}

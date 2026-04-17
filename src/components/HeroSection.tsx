@@ -9,7 +9,7 @@ const HeroSection = () => {
         <img
           src={heroImage}
           alt="Premium buffet catering spread by 2 IC Catering Singapore"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover object-center"
           width={1920}
           height={1080}
         />

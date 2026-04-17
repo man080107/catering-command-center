@@ -11,13 +11,13 @@ type MenuItem = { id: string; category: string; name: string; description: strin
 
 const AdminMenu = () => {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<"buffet" | "bento" | "connect" | "refreshment">("buffet");
+  const [activeTab, setActiveTab] = useState<"buffet" | "bento" | "connect" | "refreshment" | "bento_asian">("buffet");
   
   // Data State
   const [packages, setPackages] = useState<MenuPackage[]>([]);
   const [categories, setCategories] = useState<MenuCategory[]>([]);
   const [dishes, setDishes] = useState<MenuDish[]>([]);
-  const [bentoItems, setBentoItems] = useState<MenuItem[]>([]);
+  // We no longer use bentoItems state; we filter from packages directly
   
   const [loading, setLoading] = useState(false);
   
@@ -29,22 +29,19 @@ const AdminMenu = () => {
   const [editPkg, setEditPkg] = useState<Partial<MenuPackage> | null>(null);
   const [editCat, setEditCat] = useState<Partial<MenuCategory> | null>(null);
   const [editDish, setEditDish] = useState<Partial<MenuDish> | null>(null);
-  const [editBento, setEditBento] = useState<Partial<MenuItem> | null>(null);
+  const [editBento, setEditBento] = useState<Partial<MenuPackage> | null>(null);
 
   const loadData = async () => {
     setLoading(true);
-    const [pkgRes, catRes, dishRes, bentoRes] = await Promise.all([
+    const [pkgRes, catRes, dishRes] = await Promise.all([
       supabase.from("menu_packages").select("*").order("sort_order"),
       supabase.from("menu_categories").select("*").order("sort_order"),
       supabase.from("menu_dishes").select("*").order("sort_order"),
-      supabase.from("menu_items").select("*").eq("category", "bento").order("sort_order")
     ]);
     
-    // We ignore errors here for simplicity but could log them
     setPackages(pkgRes.data as MenuPackage[] || []);
     setCategories(catRes.data as MenuCategory[] || []);
     setDishes(dishRes.data as MenuDish[] || []);
-    setBentoItems(bentoRes.data as MenuItem[] || []);
     setLoading(false);
   };
 
@@ -113,10 +110,10 @@ const AdminMenu = () => {
   const saveBento = async () => {
     if (!editBento?.name) return;
     if (editBento.id) {
-      await supabase.from("menu_items").update(editBento as any).eq("id", editBento.id);
+      await supabase.from("menu_packages").update(editBento as any).eq("id", editBento.id);
       toast({ title: "Bento updated" });
     } else {
-      await supabase.from("menu_items").insert({ ...editBento, category: "bento", is_available: true } as any);
+      await supabase.from("menu_packages").insert({ ...editBento, tab: activeTab } as any);
       toast({ title: "Bento added" });
     }
     setEditBento(null);
@@ -125,7 +122,7 @@ const AdminMenu = () => {
 
   const removeBento = async (id: string) => {
     if (!confirm("Delete this bento set?")) return;
-    await supabase.from("menu_items").delete().eq("id", id);
+    await supabase.from("menu_packages").delete().eq("id", id);
     toast({ title: "Bento deleted" });
     loadData();
   }
@@ -275,10 +272,11 @@ const AdminMenu = () => {
   };
 
   const renderBentoTab = () => {
+    const pkgs = packages.filter(p => p.tab === activeTab);
     return (
       <div>
         <div className="flex justify-end mb-4">
-          <button onClick={() => setEditBento({ name: "Set Name", description: "Bento Description"})} className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
+          <button onClick={() => setEditBento({ name: "Set Name", description: "Bento Description", price: 10, price_label: "/pax"})} className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
             <Plus className="w-4 h-4"/> Add Bento Set
           </button>
         </div>
@@ -289,14 +287,18 @@ const AdminMenu = () => {
                <h3 className="font-bold text-sm">{editBento.id ? "Edit Bento" : "New Bento"}</h3>
                <button onClick={() => setEditBento(null)}><X className="w-4 h-4"/></button>
             </div>
-            <input className="w-full px-3 py-2 rounded border bg-background text-sm mb-2" placeholder="Bento Name (e.g. Set A - Baked Chicken Yakitori)" value={editBento.name || ""} onChange={e => setEditBento({...editBento, name: e.target.value})} />
+            <input className="w-full px-3 py-2 rounded border bg-background text-sm mb-2" placeholder={activeTab === "bento_asian" ? "Bento Name (e.g. Set 1 – Ayam Penyet)" : "Bento Name (e.g. Set A - Baked Chicken Yakitori)"} value={editBento.name || ""} onChange={e => setEditBento({...editBento, name: e.target.value})} />
             <textarea className="w-full px-3 py-2 rounded border bg-background text-sm mb-2 h-20" placeholder="Description (e.g. Red-brown rice, grilled chicken...)" value={editBento.description || ""} onChange={e => setEditBento({...editBento, description: e.target.value})} />
+            <div className="grid sm:grid-cols-2 gap-3 mb-2">
+              <input type="number" className="w-full px-3 py-2 rounded border bg-background text-sm" placeholder="Price" value={editBento.price || ""} onChange={e => setEditBento({...editBento, price: Number(e.target.value) || null})} />
+              <input className="w-full px-3 py-2 rounded border bg-background text-sm" placeholder="Price Label (e.g. /pax)" value={editBento.price_label || ""} onChange={e => setEditBento({...editBento, price_label: e.target.value})} />
+            </div>
             <div className="flex justify-end"><button onClick={saveBento} className="bg-primary text-primary-foreground px-4 py-1.5 rounded flex items-center gap-1 text-sm"><Save className="w-4 h-4"/> Save</button></div>
           </div>
         )}
 
         <div className="grid sm:grid-cols-2 gap-4">
-          {bentoItems.map(bento => (
+          {pkgs.map(bento => (
             <div key={bento.id} className="border border-border p-4 rounded-xl bg-background">
               <div className="flex justify-between items-start mb-2">
                 <h4 className="font-bold font-display">{bento.name}</h4>
@@ -305,10 +307,11 @@ const AdminMenu = () => {
                   <button onClick={() => removeBento(bento.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="w-4 h-4"/></button>
                 </div>
               </div>
+              <p className="text-xs text-primary font-bold mb-1">${bento.price}{bento.price_label}</p>
               <p className="text-sm text-muted-foreground">{bento.description}</p>
             </div>
           ))}
-          {bentoItems.length === 0 && <p className="text-muted-foreground">No bento sets found.</p>}
+          {pkgs.length === 0 && <p className="text-muted-foreground">No bento sets found in database.</p>}
         </div>
       </div>
     );
@@ -324,6 +327,7 @@ const AdminMenu = () => {
       <div className="flex gap-2 overflow-x-auto border-b border-border pb-2 mb-6">
         {[
           { id: "buffet", label: "Buffet Packages" },
+          { id: "bento_asian", label: "Bento - Asian/Local Favourites" },
           { id: "bento", label: "Bento Sets" },
           { id: "connect", label: "Connect Takeaway" },
           { id: "refreshment", label: "Refreshments" },
@@ -338,7 +342,7 @@ const AdminMenu = () => {
         ))}
       </div>
 
-      {activeTab === "bento" ? renderBentoTab() : renderNestedTree()}
+      {activeTab === "bento" || activeTab === "bento_asian" ? renderBentoTab() : renderNestedTree()}
     </div>
   );
 };
