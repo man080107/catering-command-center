@@ -24,7 +24,7 @@ const brands = [
     name: "Don Play Play",
     tagline: "Premium Japanese Donburi Bowls",
     description:
-      "Indulge in our signature donburi bowls — from torched salmon to truffle beef don. Bold flavours, generous portions, no play play.",
+      "Premium Japanese Don\n\nIndulge in our don bowls - from torched salmon to our best selling truffle beef don. Bold flavours, generous portions, Don Play Play.",
     images: [donplayplayImg, h1, h2, h3, h4],
     links: {
       website: "https://www.donplayplay.com",
@@ -37,7 +37,7 @@ const brands = [
     name: "Guudfills",
     tagline: "Artisan Filled Pastries & Bowls",
     description:
-      "A variety of irresistible hand-crafted flavors ranging from premium filled pastries to rich salmon and scallop dishes.",
+      "Guud Fills\nPremium marinated somen, salmon shoyuzuke & sushi bakes\n\nA variety of irresistible flavours paired with the freshest ingredients",
     images: [guudfillsImg, g1, g2, g3, g4, g5],
     links: {
       order: "https://take.app/guudfills",
@@ -117,7 +117,7 @@ const BrandsSection = () => {
 
               {/* Content */}
               <div className="p-6">
-                <p className="text-sm text-muted-foreground font-body leading-relaxed mb-5">
+                <p className="text-sm text-muted-foreground font-body leading-relaxed mb-5 whitespace-pre-wrap">
                   {brand.description}
                 </p>
 
