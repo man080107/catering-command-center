@@ -335,7 +335,7 @@ const AdminMenu = () => {
            <button 
              key={tab.id}
              onClick={() => { setActiveTab(tab.id as any); setEditPkg(null); setEditCat(null); setEditDish(null); setExpandedPkgId(null); setExpandedCatId(null); }}
-             className={`px-4 py-2 rounded-t-lg text-sm font-semibold whitespace-nowrap transition-colors \${activeTab === tab.id ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
+             className={`px-4 py-2 rounded-t-lg text-sm font-semibold whitespace-nowrap transition-colors ${activeTab === tab.id ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
            >
              {tab.label}
            </button>
