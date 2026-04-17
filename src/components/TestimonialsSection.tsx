@@ -1,16 +1,11 @@
 import { motion } from "framer-motion";
-import { Star, Quote } from "lucide-react";
-
-const testimonials = [
-  { text: "Fantastic service and very accommodating. The food was delicious and the team went above and beyond!", author: "Sarah L.", role: "Corporate Event Manager" },
-  { text: "Punctual delivery even during busy festive periods. Will definitely order again for our company events.", author: "James T.", role: "Office Admin" },
-  { text: "Great for large corporate events. The buffet setup was professional and the food was outstanding.", author: "Rachel W.", role: "HR Director" },
-  { text: "Delicious food and generous portions. Our team loved every single dish. Best catering in Singapore!", author: "David C.", role: "Startup Founder" },
-  { text: "Easy ordering process and responsive team. They customized our menu perfectly for dietary needs.", author: "Aisha M.", role: "Event Coordinator" },
-  { text: "Huge portions, affordable prices, and fantastic service. We've been ordering monthly for 2 years.", author: "Kevin L.", role: "Operations Manager" },
-];
+import { Star, Quote, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { allTestimonials } from "@/data/testimonials";
 
 const TestimonialsSection = () => {
+  const displayedTestimonials = allTestimonials.slice(0, 6);
+
   return (
     <section id="testimonials" className="py-20 bg-background">
       <div className="container mx-auto px-4">
@@ -31,27 +26,40 @@ const TestimonialsSection = () => {
           <p className="text-muted-foreground font-body">4.9 out of 5 · 56+ Google Reviews</p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {testimonials.map((t, i) => (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-10">
+          {displayedTestimonials.map((t, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.08 }}
-              className="bg-card border border-border rounded-xl p-6 shadow-card"
+              className="bg-card border border-border rounded-xl p-6 shadow-card flex flex-col"
             >
-              <Quote className="w-8 h-8 text-primary/20 mb-3" />
-              <p className="text-foreground/80 font-body text-sm leading-relaxed mb-4">{t.text}</p>
+              <Quote className="w-8 h-8 text-primary/20 mb-3 shrink-0" />
+              <p className="text-foreground/80 font-body text-sm leading-relaxed mb-4 flex-1 line-clamp-4">{t.text}</p>
               <div className="flex items-center gap-1 mb-2">
-                {[...Array(5)].map((_, j) => (
+                {[...Array(t.rating)].map((_, j) => (
                   <Star key={j} className="w-3.5 h-3.5 fill-accent text-accent" />
                 ))}
               </div>
               <p className="font-semibold text-sm font-body text-foreground">{t.author}</p>
-              <p className="text-xs text-muted-foreground font-body">{t.role}</p>
+              <div className="flex justify-between items-center mt-1">
+                <p className="text-xs text-muted-foreground font-body">{t.role}</p>
+                <p className="text-xs text-muted-foreground font-body">{t.time}</p>
+              </div>
             </motion.div>
           ))}
+        </div>
+
+        <div className="flex justify-center">
+          <Link
+            to="/testimonials"
+            className="group flex items-center gap-2 bg-background border border-border text-foreground px-6 py-3 rounded-lg font-semibold hover:bg-muted/50 transition-colors shadow-sm"
+          >
+            Read All {allTestimonials.length}+ Google Reviews
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </Link>
         </div>
       </div>
     </section>
