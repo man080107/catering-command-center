@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { ExternalLink, Instagram, ShoppingBag } from "lucide-react";
-import donplayplayImg from "@/assets/donplayplay-logo.jpeg";
+import donplayplayImg from "@/assets/donplayplay-logo2.png";
 import guudfillsImg from "@/assets/guudfills-logo.jpg";
 import g1 from "@/assets/g1.jpeg";
 import g2 from "@/assets/g2.jpeg";

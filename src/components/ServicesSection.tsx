@@ -3,7 +3,7 @@ import { Building2, UtensilsCrossed, PartyPopper, Package } from "lucide-react";
 import corporateImg from "@/assets/2.jpeg";
 import buffetImg from "@/assets/3.jpeg";
 import bespokeImg from "@/assets/beskope.jpeg";
-import bulkImg from "@/assets/hero-buffet.jpg";
+import bulkImg from "@/assets/hero-buffet2.jpg";
 
 const services = [
   {
