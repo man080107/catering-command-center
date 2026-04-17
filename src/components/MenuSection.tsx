@@ -290,8 +290,8 @@ const MenuSection = () => {
           <p className="text-muted-foreground font-body max-w-xl mx-auto">
             Halal-certified dishes crafted with quality ingredients.
           </p>
-          <p className="mt-3 inline-block bg-amber-50 border border-amber-300 text-amber-800 text-xs font-semibold font-body px-4 py-2 rounded-full">
-            ⚠️ Prices are subjected to 9% GST
+          <p className="mt-2 text-sm text-muted-foreground font-body max-w-xl mx-auto">
+            *Prices are subjected to 9% GST
           </p>
         </motion.div>
 
@@ -473,7 +473,7 @@ const MenuSection = () => {
                   <p className="text-center text-muted-foreground py-10">Refreshment packages are updating...</p>
                 )}
                 <p className="text-center text-xs text-muted-foreground font-body mt-6">
-                  Includes disposable wares, serviettes &amp; garbage bags. Transportation: $15 (excl. GST). Buffet setup &amp; clear up service: $85 (excl. GST).
+                  Includes disposable wares, serviettes &amp; garbage bags. Transportation: $15 (excl. GST). Buffet setup &amp; clear up service,There will be additional charge of $85 (excl. GST).
                 </p>
               </motion.div>
             )}
