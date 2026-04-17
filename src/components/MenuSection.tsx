@@ -11,7 +11,7 @@ import seasonalE from "@/assets/e.jpeg";
 import seasonalF from "@/assets/f.jpeg";
 const seasonalImages = [seasonalA, seasonalB, seasonalC, seasonalD, seasonalE, seasonalF];
 
-const tabs = ["Buffet Packages", "Bento - Asian/Local Favourites", "Bento - Healthier Choice", "Connect Takeaway", "Refreshments", "Seasonal/Festive menu"];
+const tabs = ["Buffet Packages", "Bento - Asian/Local Favourites", "Bento - Healthier Choice", "Small Group Buffet Takeaway Package", "Refreshments", "Seasonal/Festive menu"];
 const tabKeys = ["buffet", "bento_asian", "bento", "connect", "refreshments", "seasonal"];
 
 // Database Types
@@ -62,7 +62,7 @@ const fallbackBuffet: Package[] = [
   },
   {
     id: "fb-gold", tab: "buffet", name: "Gold", price: 21.80, price_label: "/pax",
-    courses: "10 Courses", min_pax: "Min 30 pax", is_popular: false,
+    courses: "10 Courses", min_pax: "Min 25 pax", is_popular: false,
     categories: [
       { id: "g1", label: "Premium (Pick 2)", items: ["Salted Egg Renkon (Lotus) Chips", "Breaded Prawn with Wasabi Mayo", "House Special Mutton Rendang", "De-shell Prawn with Chilli Crab-Less Sauce – Served with Golden Mantou", "Chicken Satay with Peanut Sauce", "Chef's Special Chicken Shepherd's Pie"] },
       { id: "g2", label: "Dim Sum (Pick 1)", items: ["Golden Sweet Potato Roll", "Chicken Siew Mai", "Shrimp Har Gao", "Stuffed You Tiao w Mayonnaise"] },
@@ -89,8 +89,8 @@ const fallbackBentoSets: Package[] = [
 ];
 
 const fallbackConnect: Package[] = [{
-  id: "fb-connect", tab: "connect", name: "Connect Takeaway", price: 18.80, price_label: "/pax",
-  courses: "8 Courses", min_pax: "Min 15 pax", is_popular: false,
+  id: "fb-connect", tab: "connect", name: "Small Group Buffet Takeaway Package", price: 18.80, price_label: "/pax",
+  courses: "8 Courses", min_pax: "Min 10 pax", is_popular: false,
   categories: [
     { id: "co1", label: "Premium (Select 1)", items: ["Breaded Prawn with Wasabi Mayo", "Salted Egg Renkon (Lotus) Chips", "House Special Mutton Rendang", "House Special Beef Rendang", "Stir Fried Black Pepper Slice Beef", "Stir Fried Sweet & Spicy Prawn (de-shell)"] },
     { id: "co2", label: "Chicken (Select 1)", items: ["Signature Curry Chicken w Potato", "House Special Butter Chicken Masala", "Fragrant Honey Boneless Chicken Cube", "Oriental BBQ Boneless Chicken Leg", "Grilled Chicken Yakitori with Roasted Sesame"] },
@@ -282,7 +282,10 @@ const MenuSection = () => {
             Our <span className="text-gradient-warm">Menu</span>
           </h2>
           <p className="text-muted-foreground font-body max-w-xl mx-auto">
-            Halal-certified dishes crafted with quality ingredients. All prices exclude GST.
+            Halal-certified dishes crafted with quality ingredients.
+          </p>
+          <p className="mt-3 inline-block bg-amber-50 border border-amber-300 text-amber-800 text-xs font-semibold font-body px-4 py-2 rounded-full">
+            ⚠️ Prices are subjected to 9% GST
           </p>
         </motion.div>
 
@@ -399,7 +402,7 @@ const MenuSection = () => {
                     <div className="text-center mb-8">
                       <div className="inline-flex items-center gap-2 bg-accent/10 text-accent-foreground px-4 py-2 rounded-full">
                         <span className="text-2xl font-bold font-display text-primary">${pkg.price || "18.80"}</span>
-                        <span className="text-sm font-body text-muted-foreground">{pkg.price_label || "/pax"} · {pkg.courses || "8 Courses"} · {pkg.min_pax || "Min 15 pax"}</span>
+                        <span className="text-sm font-body text-muted-foreground">{pkg.price_label || "/pax"} · {pkg.courses || "8 Courses"} · {pkg.min_pax || "Min 10 pax"}</span>
                       </div>
                       <p className="text-xs text-muted-foreground font-body mt-2">Option to add self-heating trays @ $25 (whole set)</p>
                     </div>
@@ -486,10 +489,12 @@ const MenuSection = () => {
         )}
 
         <div className="text-center mt-10">
-          <p className="text-sm text-muted-foreground font-body mb-4">
-            All buffet packages include warmers, tables, tablecloth &amp; biodegradable disposable wares.
-            Transportation &amp; setup: $80 (excl. GST).
-          </p>
+          {activeTab !== 1 && activeTab !== 2 && (
+            <p className="text-sm text-muted-foreground font-body mb-4">
+              All buffet packages include warmers, tables, tablecloth &amp; biodegradable disposable wares.
+              Transportation &amp; setup: $80 (excl. GST).
+            </p>
+          )}
           <a
             href="#contact"
             className="inline-block bg-gradient-warm text-primary-foreground px-8 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity shadow-warm"
