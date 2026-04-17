@@ -144,6 +144,20 @@ const ALL_FALLBACK: Package[] = [
   ...fallbackBentoAsian,
 ];
 
+const formatMinPax = (pax: string | null) => {
+  if (!pax) return "";
+  const p = pax.trim();
+  const lower = p.toLowerCase();
+  const hasMin = lower.includes("min");
+  const hasPax = lower.includes("pax") || lower.includes("sets");
+  
+  if (hasMin && hasPax) return p;
+  if (!hasMin && !hasPax) return `Min ${p} pax`;
+  if (!hasMin && hasPax) return `Min ${p}`;
+  if (hasMin && !hasPax) return `${p} pax`;
+  return p;
+};
+
 /* ──────────────────────── EXPANDABLE BUFFET CARD ──────────────────────── */
 const BuffetCard = ({ pkg }: { pkg: Package }) => {
   const [expanded, setExpanded] = useState(false);
@@ -164,7 +178,7 @@ const BuffetCard = ({ pkg }: { pkg: Package }) => {
         {pkg.price ? `$${pkg.price}` : pkg.price_label}
         {pkg.price && <span className="text-base font-normal text-muted-foreground font-body">{pkg.price_label || ""}</span>}
       </p>
-      <p className="text-sm text-muted-foreground font-body mb-3">{pkg.courses} · {pkg.min_pax}</p>
+      <p className="text-sm text-muted-foreground font-body mb-3">{pkg.courses} · {formatMinPax(pkg.min_pax)}</p>
       <hr className="mb-4 border-border" />
 
       <div className="space-y-3 flex-1">
@@ -408,7 +422,7 @@ const MenuSection = () => {
                     <div className="text-center mb-8">
                       <div className="inline-flex items-center gap-2 bg-accent/10 text-accent-foreground px-4 py-2 rounded-full">
                         <span className="text-2xl font-bold font-display text-primary">${pkg.price || "18.80"}</span>
-                        <span className="text-sm font-body text-muted-foreground">{pkg.price_label || "/pax"} · {pkg.courses || "8 Courses"} · {pkg.min_pax || "Min 10 pax"}</span>
+                        <span className="text-sm font-body text-muted-foreground">{pkg.price_label || "/pax"} · {pkg.courses || "8 Courses"} · {formatMinPax(pkg.min_pax) || "Min 10 pax"}</span>
                       </div>
                       <p className="text-xs text-muted-foreground font-body mt-2">Option to add self-heating trays @ $25 (whole set)</p>
                     </div>
