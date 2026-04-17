@@ -446,7 +446,11 @@ const MenuSection = () => {
                 {activePackages.map((pkg) => (
                   <div key={pkg.id}>
                     <div className="text-center mb-8">
-                      <p className="text-sm text-muted-foreground font-body">{pkg.min_pax || "Min 20 pax"} · {pkg.price_label || "Price quoted upon selection"}</p>
+                      <div className="text-sm text-muted-foreground font-body space-y-1 inline-block text-left">
+                        <p>- Min 20 pax</p>
+                        <p>- Option to choose takeaway trays or buffet setup</p>
+                        <p>- Price of menu will be quoted upon selection of items</p>
+                      </div>
                     </div>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {pkg.categories.map((cat) => (
