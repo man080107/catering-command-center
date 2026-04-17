@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import communityImg from "@/assets/4.jpeg";
 
 const CommunitySection = () => {
   return (
@@ -22,19 +23,19 @@ const CommunitySection = () => {
             </p>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="rounded-3xl overflow-hidden shadow-2xl"
-          >
-            <img 
-              src="https://images.unsplash.com/photo-1555244162-803834f87a33?q=80&w=2070&auto=format&fit=crop" 
-              alt="People enjoying food together"
-              className="w-full h-[400px] object-cover hover:scale-105 transition-transform duration-700"
-            />
-          </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="rounded-3xl overflow-hidden shadow-2xl"
+            >
+              <img 
+                src={communityImg} 
+                alt="People enjoying food together"
+                className="w-full h-[400px] object-cover hover:scale-105 transition-transform duration-700"
+              />
+            </motion.div>
         </div>
       </div>
     </section>
