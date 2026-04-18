@@ -22,7 +22,7 @@ import {
 const brands = [
   {
     name: "Don Play Play",
-    tagline: "Premium Japanese Donburi Bowls\n\nIndulge in our don bowls - from torched salmon to our best selling truffle beef don. Bold flavours, generous portions, Don Play Play.",
+    tagline: "Premium Japanese Bowls\n\nIndulge in our don bowls - from torched salmon to our best selling truffle beef don. Bold flavours, generous portions, Don Play Play.",
     description: "",
     images: [donplayplayImg, h1, h2, h3, h4],
     links: {
@@ -34,7 +34,7 @@ const brands = [
   },
   {
     name: "Guudfills",
-    tagline: "Artisan Filled Pastries & Bowls\n\nPremium marinated somen, salmon shoyuzuke & sushi bakes\nA variety of irresistible flavours paired with the freshest ingredients",
+    tagline: "\n\nPremium marinated somen, salmon shoyuzuke & sushi bakes\nA variety of irresistible flavours paired with the freshest ingredients",
     description: "",
     images: [guudfillsImg, g1, g2, g3, g4, g5],
     links: {

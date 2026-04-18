@@ -373,7 +373,7 @@ const MenuSection = () => {
                   <p className="text-center text-muted-foreground py-10">Bento sets are updating...</p>
                 )}
                 <p className="text-center text-xs text-muted-foreground font-body mt-6">
-                  Includes full cutlery set &amp; serviettes. Food best consumed within 2 hours. Transportation: $10 (excl. GST) for orders under $300.
+                  Includes full cutlery set &amp; serviettes. Food best consumed within 2 hours. Transportation: $10 (excl. GST) for all orders.
                 </p>
               </motion.div>
             )}
@@ -407,7 +407,7 @@ const MenuSection = () => {
                   <p className="text-center text-muted-foreground py-10">Bento sets are updating...</p>
                 )}
                 <p className="text-center text-xs text-muted-foreground font-body mt-6">
-                  Includes full cutlery set &amp; serviettes. Food best consumed within 2 hours. Transportation: $10 (excl. GST) for orders under $300.
+                  Includes full cutlery set &amp; serviettes. Food best consumed within 2 hours. Transportation: $10 (excl. GST) for all orders.
                 </p>
               </motion.div>
             )}
@@ -487,7 +487,7 @@ const MenuSection = () => {
                   <p className="text-center text-muted-foreground py-10">Refreshment packages are updating...</p>
                 )}
                 <p className="text-center text-xs text-muted-foreground font-body mt-6">
-                  Includes disposable wares, serviettes &amp; garbage bags. Transportation: $15 (excl. GST). Buffet setup &amp; clear up service,There will be additional charge of $85 (excl. GST).
+                  Includes disposable wares, serviettes &amp; garbage bags. Transportation: $15 (excl. GST).<br />Buffet setup &amp; clear up service,There will be additional charge of $65 (excl. GST).
                 </p>
               </motion.div>
             )}
