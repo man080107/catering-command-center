@@ -33,8 +33,8 @@ const brands = [
     accent: "from-amber-600 to-orange-500",
   },
   {
-    name: "Guudfills",
-    tagline: "\n\nPremium marinated somen, salmon shoyuzuke & sushi bakes\nA variety of irresistible flavours paired with the freshest ingredients",
+    name: "Guud Fills",
+    tagline: "Premium marinated somen, salmon shoyuzuke & sushi bakes\n\n\nA variety of irresistible flavours paired with the freshest ingredients",
     description: "",
     images: [guudfillsImg, g1, g2, g3, g4, g5],
     links: {
