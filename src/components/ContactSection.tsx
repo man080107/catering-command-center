@@ -31,7 +31,7 @@ const ContactSection = () => {
     }
     toast({
       title: "Quote Request Sent!",
-      description: "We'll get back to you within 24 hours.",
+      description: "We'll get back to you.",
     });
     setForm({ name: "", phone: "", email: "", eventType: "", pax: "", date: "", message: "" });
   };
@@ -49,7 +49,7 @@ const ContactSection = () => {
             Get a <span className="text-gradient-warm">Free Quote</span>
           </h2>
           <p className="text-muted-foreground font-body max-w-xl mx-auto">
-            Tell us about your event and we'll prepare a customized quote within 24 hours.
+            Tell us about your event and we'll prepare a customized quote.
           </p>
         </motion.div>
 

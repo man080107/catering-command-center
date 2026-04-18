@@ -520,7 +520,7 @@ const MenuSection = () => {
         )}
 
         <div className="text-center mt-10">
-          {activeTab !== 1 && activeTab !== 2 && (
+          {(activeTab === 0 || activeTab === 5) && (
             <p className="text-sm text-muted-foreground font-body mb-4">
               All buffet packages include warmers, tables, tablecloth &amp; biodegradable disposable wares.
               Transportation &amp; setup: $80 (excl. GST).

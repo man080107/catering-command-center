@@ -22,9 +22,8 @@ import {
 const brands = [
   {
     name: "Don Play Play",
-    tagline: "Premium Japanese Donburi Bowls",
-    description:
-      "Premium Japanese Don\n\nIndulge in our don bowls - from torched salmon to our best selling truffle beef don. Bold flavours, generous portions, Don Play Play.",
+    tagline: "Premium Japanese Donburi Bowls\n\nIndulge in our don bowls - from torched salmon to our best selling truffle beef don. Bold flavours, generous portions, Don Play Play.",
+    description: "",
     images: [donplayplayImg, h1, h2, h3, h4],
     links: {
       website: "https://www.donplayplay.com",
@@ -35,9 +34,8 @@ const brands = [
   },
   {
     name: "Guudfills",
-    tagline: "Artisan Filled Pastries & Bowls",
-    description:
-      "Guud Fills\nPremium marinated somen, salmon shoyuzuke & sushi bakes\n\nA variety of irresistible flavours paired with the freshest ingredients",
+    tagline: "Artisan Filled Pastries & Bowls\n\nPremium marinated somen, salmon shoyuzuke & sushi bakes\nA variety of irresistible flavours paired with the freshest ingredients",
+    description: "",
     images: [guudfillsImg, g1, g2, g3, g4, g5],
     links: {
       order: "https://take.app/guudfills",
@@ -109,7 +107,7 @@ const BrandsSection = () => {
                   <h3 className="text-2xl font-bold font-display text-primary-foreground drop-shadow-lg">
                     {brand.name}
                   </h3>
-                  <p className="text-sm font-body text-primary-foreground/80 drop-shadow">
+                  <p className="text-sm font-body text-primary-foreground/80 drop-shadow whitespace-pre-wrap">
                     {brand.tagline}
                   </p>
                 </div>
@@ -117,9 +115,11 @@ const BrandsSection = () => {
 
               {/* Content */}
               <div className="p-6">
-                <p className="text-sm text-muted-foreground font-body leading-relaxed mb-5 whitespace-pre-wrap">
-                  {brand.description}
-                </p>
+                {brand.description && (
+                  <p className="text-sm text-muted-foreground font-body leading-relaxed mb-5 whitespace-pre-wrap">
+                    {brand.description}
+                  </p>
+                )}
 
                 <div className="flex flex-wrap gap-3">
                   {brand.links.website && (
