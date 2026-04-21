@@ -14,7 +14,8 @@ const ContactSection = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    const { error } = await supabase.from("inquiries").insert({
+
+    const inquiryPayload = {
       name: form.name,
       phone: form.phone,
       email: form.email || null,
@@ -22,17 +23,61 @@ const ContactSection = () => {
       pax: form.pax ? Number(form.pax) : null,
       event_date: form.date || null,
       message: form.message || null,
-    });
-    setSubmitting(false);
-    if (error) {
-      console.error("Inquiry Error Payload:", error);
-      toast({ title: "Error", description: "Failed to send: " + (error.message || error.details || "Unknown error"), variant: "destructive" });
+    };
+
+    console.log("[ContactForm] Submitting inquiry:", inquiryPayload);
+
+    // Step 1: Save to Supabase database
+    const { error: dbError } = await supabase.from("inquiries").insert(inquiryPayload);
+
+    if (dbError) {
+      console.error("[ContactForm] Database insert failed:", dbError);
+      setSubmitting(false);
+      toast({
+        title: "❌ Submission Failed",
+        description: "Failed to send: " + (dbError.message || dbError.details || "Unknown error"),
+        variant: "destructive",
+      });
       return;
     }
-    toast({
-      title: "Quote Request Sent!",
-      description: "We'll get back to you.",
+
+    console.log("[ContactForm] ✅ Inquiry saved to database");
+
+    // Step 2: Trigger email notification via Supabase Edge Function
+    console.log("[ContactForm] Invoking notify-inquiry edge function...");
+    const { data: fnData, error: fnError } = await supabase.functions.invoke("notify-inquiry", {
+      body: inquiryPayload,
     });
+
+    setSubmitting(false);
+
+    if (fnError) {
+      console.error("[ContactForm] Edge function invocation error:", fnError);
+      // Still show success since DB insert worked — just warn about email
+      toast({
+        title: "✅ Quote Request Received!",
+        description: "Your inquiry is saved. Note: email notification may be delayed.",
+      });
+    } else {
+      console.log("[ContactForm] ✅ Edge function response:", fnData);
+      const adminSent = fnData?.adminEmailSent;
+      const customerSent = fnData?.customerReplySent;
+
+      if (adminSent === false) {
+        console.warn("[ContactForm] Admin email failed:", fnData?.errors);
+        toast({
+          title: "✅ Inquiry Received",
+          description: "Saved successfully. Admin email notification may be delayed.",
+        });
+      } else {
+        const desc = form.email
+          ? `We'll contact you shortly. A confirmation has been sent to ${form.email}`
+          : "We'll be in touch shortly via phone.";
+        console.log(`[ContactForm] Admin notified: ${adminSent}, Customer reply sent: ${customerSent}`);
+        toast({ title: "✅ Quote Request Sent!", description: desc });
+      }
+    }
+
     setForm({ name: "", phone: "", email: "", eventType: "", pax: "", date: "", message: "" });
   };
 
