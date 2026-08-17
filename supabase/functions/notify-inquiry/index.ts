@@ -1,13 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-
-// Admin notification target — always receives inquiry emails
 const NOTIFY_EMAIL = Deno.env.get("NOTIFY_EMAIL") || "kenny.huang@2iccatering.com";
-
-// Sender address — must be from a Resend-verified domain
 const FROM_EMAIL = Deno.env.get("FROM_EMAIL") || "noreply@2iccatering.com";
 const FROM_NAME = "2 IC Catering";
+const TURNSTILE_SECRET_KEY = Deno.env.get("TURNSTILE_SECRET_KEY");
+
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -22,6 +23,102 @@ interface InquiryPayload {
   pax?: number | null;
   event_date?: string | null;
   message?: string | null;
+  // Anti-spam fields
+  confirmWebsite?: string | null;
+  elapsedTimeMs?: number | null;
+  turnstileToken?: string | null;
+}
+
+// ─── Gibberish & Bot Signature Detector ─────────────────────────────────────
+function isExtremeGibberish(text: string): boolean {
+  if (!text) return false;
+  const clean = text.trim().toLowerCase();
+
+  // Flag raw URL/HTML injection attempts
+  if (/https?:\/\/|<script|\[url=/i.test(clean)) return true;
+
+  // Check for 6+ consecutive consonants without a vowel or space (e.g. Crzs Npyngl, Xiylgej Dzhilv)
+  if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(clean)) return true;
+
+  return false;
+}
+
+// ─── Turnstile Token Verification ─────────────────────────────────────────────
+async function verifyTurnstileToken(token: string, clientIp: string): Promise<boolean> {
+  if (!TURNSTILE_SECRET_KEY) return true; // Gracefully pass if Turnstile key is not set
+  try {
+    const formData = new FormData();
+    formData.append("secret", TURNSTILE_SECRET_KEY);
+    formData.append("response", token);
+    if (clientIp && clientIp !== "unknown") formData.append("remoteip", clientIp);
+
+    const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      body: formData,
+    });
+    const data = await res.json();
+    return data.success === true;
+  } catch (err) {
+    console.error("[notify-inquiry] Turnstile verification error:", err);
+    return false;
+  }
+}
+
+// ─── Persistent DB Rate Limit Check ─────────────────────────────────────────
+async function checkRateLimit(supabaseAdmin: any, ip: string): Promise<boolean> {
+  if (!supabaseAdmin || !ip || ip === "unknown") return true;
+  try {
+    const tenMinsAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+    
+    // Query rate limits table
+    const { data, error } = await supabaseAdmin
+      .from("inquiry_rate_limits")
+      .select("request_count")
+      .eq("ip_address", ip)
+      .gte("window_start", tenMinsAgo);
+
+    if (error) {
+      console.warn("[notify-inquiry] Rate limit DB query error (non-fatal):", error);
+      return true; // Fail safe
+    }
+
+    const totalRequests = (data || []).reduce((acc: number, item: any) => acc + (item.request_count || 1), 0);
+    if (totalRequests >= 5) {
+      return false; // Rate limit exceeded (more than 5 inquiries per 10 min)
+    }
+
+    // Record request
+    await supabaseAdmin.from("inquiry_rate_limits").insert({
+      ip_address: ip,
+      window_start: new Date().toISOString(),
+      request_count: 1,
+    });
+
+    return true;
+  } catch (err) {
+    console.error("[notify-inquiry] Rate limit check exception:", err);
+    return true; // Fail safe
+  }
+}
+
+// ─── Duplicate Submission Check ──────────────────────────────────────────────
+async function isDuplicateSubmission(supabaseAdmin: any, payload: InquiryPayload): Promise<boolean> {
+  if (!supabaseAdmin) return false;
+  try {
+    const fiveMinsAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    const { data } = await supabaseAdmin
+      .from("inquiries")
+      .select("id")
+      .eq("name", payload.name.trim())
+      .eq("phone", payload.phone.trim())
+      .gte("created_at", fiveMinsAgo)
+      .limit(1);
+
+    return (data && data.length > 0) ? true : false;
+  } catch (err) {
+    console.error("[notify-inquiry] Duplicate check exception:", err);
+    return false;
+  }
 }
 
 // ─── Helper: send a single email via Resend ──────────────────────────────────
@@ -246,14 +343,15 @@ serve(async (req) => {
 
   console.log("[notify-inquiry] Function invoked");
 
-  // Guard: ensure RESEND_API_KEY is set
-  if (!RESEND_API_KEY) {
-    console.error("[notify-inquiry] CRITICAL: RESEND_API_KEY secret is not set!");
-    return new Response(
-      JSON.stringify({ error: "Server misconfiguration: RESEND_API_KEY not set" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
-  }
+  // Client IP extraction
+  const clientIp = req.headers.get("cf-connecting-ip") ||
+                   req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+                   "unknown";
+
+  // Create admin Supabase client (using service role key if available, or fallback to anon key)
+  const supabaseAdmin = (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY)
+    ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+    : null;
 
   try {
     const inquiry: InquiryPayload = await req.json();
@@ -264,9 +362,146 @@ serve(async (req) => {
       event_type: inquiry.event_type,
       pax: inquiry.pax,
       event_date: inquiry.event_date,
+      ip: clientIp,
     }));
 
-    const eventDate = inquiry.event_date
+    let isSpam = false;
+    let spamReason = "";
+
+    // ── 1. Honeypot Check ──────────────────────────────────────────────────
+    if (inquiry.confirmWebsite && inquiry.confirmWebsite.trim() !== "") {
+      isSpam = true;
+      spamReason = "Honeypot field filled by bot";
+      console.warn("[notify-inquiry] Spam detected:", spamReason);
+    }
+
+    // ── 2. Submission Speed Check (<2 seconds) ────────────────────────────
+    if (!isSpam && inquiry.elapsedTimeMs && inquiry.elapsedTimeMs < 2000) {
+      isSpam = true;
+      spamReason = "Submission completed impossibly fast (< 2s)";
+      console.warn("[notify-inquiry] Spam detected:", spamReason);
+    }
+
+    // ── 3. Cloudflare Turnstile Token Verification (if configured) ─────────
+    if (!isSpam && TURNSTILE_SECRET_KEY) {
+      if (!inquiry.turnstileToken) {
+        isSpam = true;
+        spamReason = "Missing Cloudflare Turnstile token";
+      } else {
+        const turnstileValid = await verifyTurnstileToken(inquiry.turnstileToken, clientIp);
+        if (!turnstileValid) {
+          isSpam = true;
+          spamReason = "Cloudflare Turnstile verification failed";
+        }
+      }
+    }
+
+    // ── 4. Server-Side Payload & Gibberish Validation ─────────────────────
+    if (!isSpam) {
+      // Name checks
+      const cleanName = (inquiry.name || "").trim();
+      if (!cleanName || cleanName.length < 2 || cleanName.length > 100 || isExtremeGibberish(cleanName)) {
+        isSpam = true;
+        spamReason = "Client name invalid or contains gibberish bot pattern";
+      }
+
+      // Phone checks
+      const cleanPhone = (inquiry.phone || "").replace(/\D/g, "");
+      if (!isSpam && (cleanPhone.length < 7 || cleanPhone.length > 15 || /^0+$/.test(cleanPhone))) {
+        isSpam = true;
+        spamReason = "Invalid phone number length or repeated zero pattern";
+      }
+
+      // Email checks (if provided)
+      if (!isSpam && inquiry.email && inquiry.email.trim() !== "") {
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(inquiry.email.trim())) {
+          isSpam = true;
+          spamReason = "Invalid email format";
+        }
+      }
+
+      // Event Date checks
+      if (!isSpam && inquiry.event_date) {
+        const parsedDate = new Date(inquiry.event_date);
+        const parsedYear = parsedDate.getFullYear();
+        const currentYear = new Date().getFullYear();
+        if (isNaN(parsedDate.getTime()) || parsedYear < currentYear - 1) {
+          isSpam = true;
+          spamReason = `Invalid event date or year (${inquiry.event_date})`;
+        }
+      }
+
+      // Pax range checks
+      if (!isSpam && inquiry.pax != null) {
+        const paxNum = Number(inquiry.pax);
+        if (isNaN(paxNum) || paxNum < 1 || paxNum > 5000) {
+          isSpam = true;
+          spamReason = "Guest count (pax) outside realistic range (1-5000)";
+        }
+      }
+    }
+
+    // ── 5. Database Rate Limiting Check ────────────────────────────────────
+    if (!isSpam && supabaseAdmin) {
+      const allowed = await checkRateLimit(supabaseAdmin, clientIp);
+      if (!allowed) {
+        isSpam = true;
+        spamReason = "IP rate limit exceeded (5 requests per 10 min)";
+      }
+    }
+
+    // ── 6. Duplicate Submission Check ─────────────────────────────────────
+    if (!isSpam && supabaseAdmin) {
+      const isDup = await isDuplicateSubmission(supabaseAdmin, inquiry);
+      if (isDup) {
+        isSpam = true;
+        spamReason = "Duplicate inquiry submitted within 5 minutes";
+      }
+    }
+
+    const inquiryStatus = isSpam ? "spam" : "pending";
+
+    // ── 7. Save to Database via Server Role Client ────────────────────────
+    if (supabaseAdmin) {
+      const dbPayload = {
+        name: inquiry.name ? inquiry.name.trim() : "Unknown",
+        phone: inquiry.phone ? inquiry.phone.trim() : "",
+        email: inquiry.email ? inquiry.email.trim() : null,
+        event_type: inquiry.event_type || null,
+        pax: inquiry.pax ? Number(inquiry.pax) : null,
+        event_date: inquiry.event_date || null,
+        message: inquiry.message ? inquiry.message.trim() : null,
+        status: inquiryStatus,
+        spam_reason: spamReason || null,
+        ip_address: clientIp !== "unknown" ? clientIp : null,
+      };
+
+      const { error: insertErr } = await supabaseAdmin.from("inquiries").insert(dbPayload);
+      if (insertErr) {
+        console.error("[notify-inquiry] DB insert via admin client failed:", insertErr);
+      } else {
+        console.log(`[notify-inquiry] ✅ Inquiry saved to database with status '${inquiryStatus}'`);
+      }
+    }
+
+    // ── 8. Conditional Email Dispatch ─────────────────────────────────────
+    // IF SPAM: DO NOT SEND ANY EMAIL NOTIFICATION
+    if (isSpam) {
+      console.warn(`[notify-inquiry] 🛡️ SPAM BLOCKED: Suppressing email notifications. Reason: ${spamReason}`);
+      return new Response(
+        JSON.stringify({
+          success: true,
+          status: "spam",
+          adminEmailSent: false,
+          reason: spamReason,
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // IF LEGITIMATE INQUIRY: SEND EMAILS
+    const eventDateStr = inquiry.event_date
       ? new Date(inquiry.event_date).toLocaleDateString("en-SG", {
           day: "2-digit",
           month: "long",
@@ -276,9 +511,9 @@ serve(async (req) => {
 
     const errors: string[] = [];
 
-    // ── 1. Send admin notification ────────────────────────────────────────
+    // Send admin email
     console.log(`[notify-inquiry] Sending admin notification to: ${NOTIFY_EMAIL}`);
-    const adminHtml = buildAdminEmailHtml(inquiry, eventDate);
+    const adminHtml = buildAdminEmailHtml(inquiry, eventDateStr);
     const adminResult = await sendEmail(
       [NOTIFY_EMAIL],
       `🍽️ New Quote Request from ${inquiry.name} — ${inquiry.event_type || "Catering Inquiry"}`,
@@ -293,12 +528,12 @@ serve(async (req) => {
       console.log("[notify-inquiry] ✅ Admin notification sent successfully");
     }
 
-    // ── 2. Send customer auto-reply (only if customer provided their email) ──
-    if (inquiry.email) {
+    // Send customer auto-reply email if email provided
+    if (inquiry.email && inquiry.email.trim() !== "") {
       console.log(`[notify-inquiry] Sending customer auto-reply to: ${inquiry.email}`);
-      const customerHtml = buildCustomerEmailHtml(inquiry, eventDate);
+      const customerHtml = buildCustomerEmailHtml(inquiry, eventDateStr);
       const customerResult = await sendEmail(
-        [inquiry.email],
+        [inquiry.email.trim()],
         "✅ We received your catering inquiry — 2 IC Catering",
         customerHtml
       );
@@ -310,22 +545,12 @@ serve(async (req) => {
       } else {
         console.log("[notify-inquiry] ✅ Customer auto-reply sent successfully");
       }
-    } else {
-      console.log("[notify-inquiry] No customer email provided — skipping auto-reply");
-    }
-
-    // Return result
-    if (errors.length > 0 && !adminResult.ok) {
-      // Admin email failed — this is a real error
-      return new Response(
-        JSON.stringify({ error: errors.join("; ") }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
     }
 
     return new Response(
       JSON.stringify({
         success: true,
+        status: "pending",
         adminEmailSent: adminResult.ok,
         customerReplySent: inquiry.email ? true : false,
         errors: errors.length > 0 ? errors : undefined,
@@ -336,8 +561,9 @@ serve(async (req) => {
   } catch (err) {
     console.error("[notify-inquiry] Unhandled exception:", err);
     return new Response(
-      JSON.stringify({ error: String(err) }),
+      JSON.stringify({ error: "Failed to process inquiry request." }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
+

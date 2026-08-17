@@ -58,6 +58,7 @@ const AdminInquiries = () => {
                   <option value="pending">Pending</option>
                   <option value="contacted">Contacted</option>
                   <option value="completed">Completed</option>
+                  <option value="spam">Spam / Blocked</option>
                 </select>
               </div>
               <div className="grid sm:grid-cols-2 gap-2 text-sm font-body text-foreground/80 mb-3">

@@ -7,78 +7,147 @@ import { supabase } from "@/integrations/supabase/client";
 const ContactSection = () => {
   const { toast } = useToast();
   const [form, setForm] = useState({
-    name: "", phone: "", email: "", eventType: "", pax: "", date: "", message: "",
+    name: "",
+    phone: "",
+    email: "",
+    eventType: "",
+    pax: "",
+    date: "",
+    message: "",
+    confirmWebsite: "", // Honeypot field for bot detection
   });
   const [submitting, setSubmitting] = useState(false);
+  const [mountedAt] = useState(() => Date.now());
+
+  // Today's date string (YYYY-MM-DD) for min date constraint
+  const todayStr = new Date().toISOString().split("T")[0];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
 
-    const inquiryPayload = {
-      name: form.name,
-      phone: form.phone,
-      email: form.email || null,
-      event_type: form.eventType || null,
-      pax: form.pax ? Number(form.pax) : null,
-      event_date: form.date || null,
-      message: form.message || null,
-    };
-
-    console.log("[ContactForm] Submitting inquiry:", inquiryPayload);
-
-    // Step 1: Save to Supabase database
-    const { error: dbError } = await supabase.from("inquiries").insert(inquiryPayload);
-
-    if (dbError) {
-      console.error("[ContactForm] Database insert failed:", dbError);
-      setSubmitting(false);
+    // ── 1. Honeypot check (Silent rejection for bots) ─────────────────────
+    if (form.confirmWebsite && form.confirmWebsite.trim() !== "") {
+      console.warn("[ContactForm] Spam bot detected via honeypot field.");
+      // Pretend success to fool the bot into thinking submission succeeded
       toast({
-        title: "❌ Submission Failed",
-        description: "Failed to send: " + (dbError.message || dbError.details || "Unknown error"),
+        title: "✅ Quote Request Sent!",
+        description: "We'll contact you shortly.",
+      });
+      setForm({ name: "", phone: "", email: "", eventType: "", pax: "", date: "", message: "", confirmWebsite: "" });
+      return;
+    }
+
+    // ── 2. Submission speed check (<2.5 seconds = automated script) ──────────
+    const elapsed = Date.now() - mountedAt;
+    if (elapsed < 2500) {
+      console.warn("[ContactForm] Spam bot detected via submission speed:", elapsed, "ms");
+      toast({
+        title: "✅ Quote Request Sent!",
+        description: "We'll contact you shortly.",
+      });
+      setForm({ name: "", phone: "", email: "", eventType: "", pax: "", date: "", message: "", confirmWebsite: "" });
+      return;
+    }
+
+    // ── 3. Client Cooldown (Prevent rapid re-submissions within 45s) ────────
+    const lastSubmit = localStorage.getItem("last_quote_submit");
+    if (lastSubmit) {
+      const timeSinceLast = Date.now() - Number(lastSubmit);
+      if (timeSinceLast < 45000) {
+        const remainingSec = Math.ceil((45000 - timeSinceLast) / 1000);
+        toast({
+          title: "⏳ Please Wait",
+          description: `You sent a quote request recently. Please wait ${remainingSec} seconds before submitting another.`,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    // ── 4. Event Date Validation ──────────────────────────────────────────
+    if (form.date) {
+      const selectedDate = new Date(form.date);
+      const selectedYear = selectedDate.getFullYear();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (isNaN(selectedDate.getTime()) || selectedYear < 2024 || selectedDate < today) {
+        toast({
+          title: "❌ Invalid Event Date",
+          description: "Please select a valid current or future date for your event.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    // ── 5. Phone & Name basic sanity check ────────────────────────────────
+    const cleanPhone = form.phone.replace(/\D/g, "");
+    if (cleanPhone.length < 7) {
+      toast({
+        title: "❌ Invalid Phone Number",
+        description: "Please enter a valid contact phone number.",
         variant: "destructive",
       });
       return;
     }
 
-    console.log("[ContactForm] ✅ Inquiry saved to database");
+    setSubmitting(true);
 
-    // Step 2: Trigger email notification via Supabase Edge Function
-    console.log("[ContactForm] Invoking notify-inquiry edge function...");
-    const { data: fnData, error: fnError } = await supabase.functions.invoke("notify-inquiry", {
-      body: inquiryPayload,
-    });
+    const elapsedTimeMs = Date.now() - mountedAt;
 
-    setSubmitting(false);
+    const inquiryPayload = {
+      name: form.name.trim(),
+      phone: form.phone.trim(),
+      email: form.email ? form.email.trim() : null,
+      event_type: form.eventType || null,
+      pax: form.pax ? Number(form.pax) : null,
+      event_date: form.date || null,
+      message: form.message ? form.message.trim() : null,
+      confirmWebsite: form.confirmWebsite || null,
+      elapsedTimeMs: elapsedTimeMs,
+    };
 
-    if (fnError) {
-      console.error("[ContactForm] Edge function invocation error:", fnError);
-      // Still show success since DB insert worked — just warn about email
-      toast({
-        title: "✅ Quote Request Received!",
-        description: "Your inquiry is saved. Note: email notification may be delayed.",
+    console.log("[ContactForm] Invoking secure notify-inquiry edge function...");
+
+    // Record submission timestamp for local cooldown
+    localStorage.setItem("last_quote_submit", Date.now().toString());
+
+    try {
+      const { data: fnData, error: fnError } = await supabase.functions.invoke("notify-inquiry", {
+        body: inquiryPayload,
       });
-    } else {
-      console.log("[ContactForm] ✅ Edge function response:", fnData);
-      const adminSent = fnData?.adminEmailSent;
-      const customerSent = fnData?.customerReplySent;
 
-      if (adminSent === false) {
-        console.warn("[ContactForm] Admin email failed:", fnData?.errors);
+      setSubmitting(false);
+
+      if (fnError) {
+        console.error("[ContactForm] Edge function invocation error:", fnError);
         toast({
-          title: "✅ Inquiry Received",
-          description: "Saved successfully. Admin email notification may be delayed.",
+          title: "❌ Submission Failed",
+          description: "Sorry, we couldn't submit your inquiry right now. Please try again or contact us directly at +65 9838 9733.",
+          variant: "destructive",
         });
-      } else {
-        const desc = form.email
-          ? `We'll contact you shortly. A confirmation has been sent to ${form.email}`
-          : "We'll be in touch shortly via phone.";
-        console.log(`[ContactForm] Admin notified: ${adminSent}, Customer reply sent: ${customerSent}`);
-        toast({ title: "✅ Quote Request Sent!", description: desc });
+        return;
       }
-    }
 
-    setForm({ name: "", phone: "", email: "", eventType: "", pax: "", date: "", message: "" });
+      console.log("[ContactForm] ✅ Edge function response:", fnData);
+
+      const desc = form.email
+        ? `We'll contact you shortly. A confirmation has been sent to ${form.email}`
+        : "We'll be in touch shortly via phone.";
+
+      toast({ title: "✅ Quote Request Sent!", description: desc });
+      setForm({ name: "", phone: "", email: "", eventType: "", pax: "", date: "", message: "", confirmWebsite: "" });
+
+    } catch (err) {
+      console.error("[ContactForm] Fail-safe catch exception:", err);
+      setSubmitting(false);
+      toast({
+        title: "❌ Submission Issue",
+        description: "An unexpected error occurred. Please call or WhatsApp us directly at +65 9838 9733.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -106,6 +175,24 @@ const ContactSection = () => {
             onSubmit={handleSubmit}
             className="lg:col-span-3 space-y-4"
           >
+            {/* Honeypot anti-spam field (hidden from human users, filled by bots) */}
+            <div
+              className="opacity-0 absolute -left-[9999px] -top-[9999px] h-0 w-0 overflow-hidden pointer-events-none select-none"
+              aria-hidden="true"
+              tabIndex={-1}
+            >
+              <label htmlFor="confirmWebsite">Leave this field blank</label>
+              <input
+                type="text"
+                id="confirmWebsite"
+                name="confirmWebsite"
+                autoComplete="off"
+                tabIndex={-1}
+                value={form.confirmWebsite}
+                onChange={(e) => setForm({ ...form, confirmWebsite: e.target.value })}
+              />
+            </div>
+
             <div className="grid sm:grid-cols-2 gap-4">
               <input
                 type="text" placeholder="Your Name *" required
@@ -143,6 +230,7 @@ const ContactSection = () => {
               />
               <input
                 type="date"
+                min={todayStr}
                 value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })}
                 className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground font-body text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all"
               />
@@ -210,3 +298,4 @@ const ContactSection = () => {
 };
 
 export default ContactSection;
+
