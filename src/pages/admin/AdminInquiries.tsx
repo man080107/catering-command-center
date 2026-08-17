@@ -13,6 +13,7 @@ const AdminInquiries = () => {
   const { toast } = useToast();
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(false);
+  const [filter, setFilter] = useState("all_active");
 
   const load = async () => {
     const { data } = await supabase.from("inquiries").select("*").order("created_at", { ascending: false });
@@ -32,16 +33,38 @@ const AdminInquiries = () => {
     await supabase.from("inquiries").update({ admin_notes: notes }).eq("id", id);
   };
 
-
+  const filteredInquiries = inquiries.filter((inq) => {
+    if (filter === "all_active") return inq.status !== "spam";
+    if (filter === "all") return true;
+    return inq.status === filter;
+  });
 
   return (
     <div>
-      <h1 className="text-2xl font-bold font-display text-foreground mb-6">Inquiries</h1>
-      {inquiries.length === 0 ? (
-        <p className="text-muted-foreground font-body">No inquiries yet.</p>
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <h1 className="text-2xl font-bold font-display text-foreground">Inquiries</h1>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground font-body">Filter:</span>
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="text-xs font-semibold font-body px-3 py-1.5 rounded-lg border border-border bg-background text-foreground"
+          >
+            <option value="all_active">Active Inquiries (Hide Spam)</option>
+            <option value="pending">Pending Only</option>
+            <option value="contacted">Contacted Only</option>
+            <option value="completed">Completed Only</option>
+            <option value="spam">Blocked Spam</option>
+            <option value="all">Show All</option>
+          </select>
+        </div>
+      </div>
+
+      {filteredInquiries.length === 0 ? (
+        <p className="text-muted-foreground font-body">No inquiries found for this filter.</p>
       ) : (
         <div className="space-y-4">
-          {inquiries.map((inq) => (
+          {filteredInquiries.map((inq) => (
             <div key={inq.id} className="bg-card border border-border rounded-xl p-5">
               <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
                 <div>

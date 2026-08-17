@@ -9,11 +9,11 @@ const AdminDashboard = () => {
   useEffect(() => {
     const load = async () => {
       const [inq, pending, menu, brands, recent] = await Promise.all([
-        supabase.from("inquiries").select("id", { count: "exact", head: true }),
+        supabase.from("inquiries").select("id", { count: "exact", head: true }).neq("status", "spam"),
         supabase.from("inquiries").select("id", { count: "exact", head: true }).eq("status", "pending"),
         supabase.from("menu_items").select("id", { count: "exact", head: true }),
         supabase.from("brands").select("id", { count: "exact", head: true }),
-        supabase.from("inquiries").select("*").order("created_at", { ascending: false }).limit(5),
+        supabase.from("inquiries").select("*").neq("status", "spam").order("created_at", { ascending: false }).limit(5),
       ]);
       setStats({
         inquiries: inq.count || 0,
